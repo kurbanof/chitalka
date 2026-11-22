@@ -408,16 +408,7 @@ body.boot .lib-hero, body.boot .sec-h, body.boot .book-card, body.boot .empty, b
 .pair-card { flex-wrap: wrap; row-gap: 0; }
 .pair-card .mono { width: 44px; height: 58px; font-size: 22px; }
 .pair-card .book-meta { flex: 1; }
-.langpick { display: flex; gap: 6px; flex: none; }
-.lp { all: unset; box-sizing: border-box; position: relative; overflow: hidden; width: 58px; height: 58px; border-radius: 18px; background: var(--chip); border: 1px solid var(--line-on-glass); cursor: pointer;
-  display: grid; place-items: center; align-content: center; gap: 1px; text-align: center; transition: transform .16s cubic-bezier(.2, .8, .2, 1), background-color .2s; }
-.lp:active { transform: scale(.92); }
-.lp:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.lp b { position: relative; font: 800 15px/1 var(--font-ui); letter-spacing: .02em; color: var(--ink); }
-.lp em { position: relative; font: 700 11px/1 var(--font-ui); font-style: normal; color: var(--muted); }
-.lp i { position: absolute; left: 0; right: 0; bottom: 0; height: var(--p, 0%); background: var(--hl-s); transition: height .5s cubic-bezier(.2, .8, .2, 1); }
-.lp:first-child { background: color-mix(in srgb, var(--c1) 34%, var(--chip)); }
-.lp:last-child { background: color-mix(in srgb, var(--c3) 34%, var(--chip)); }
+
 .more { flex: none; min-height: 36px; padding: 0 8px; margin-left: -4px; }
 .pair-del { flex-basis: 100%; display: grid; grid-template-rows: 0fr; transition: grid-template-rows .3s cubic-bezier(.2, .8, .2, 1); }
 .pair-del > div { overflow: hidden; display: flex; gap: 8px; justify-content: flex-end; min-height: 0; }
@@ -561,27 +552,39 @@ body.boot .lib-hero, body.boot .sec-h, body.boot .book-card, body.boot .empty, b
 .pair-card { flex-wrap: wrap; align-items: stretch; column-gap: 16px; }
 .pair-card .book-meta { gap: 4px; }
 .cvs { position: relative; flex: none; width: 112px; aspect-ratio: 2 / 3.1; }
-.cvs .cv { position: absolute; left: 0; top: 0; width: 98px; }
-.cvs .cv.back { left: auto; right: 0; top: 10px; transform: rotate(4deg); filter: brightness(.88) saturate(.9); }
-.book-meta > .langpick { display: flex; gap: 8px; margin-top: auto; flex: none; white-space: normal; overflow: visible; }
-.lp { flex: 1; width: auto; height: 46px; border-radius: 16px; display: flex; flex-direction: row; justify-content: center; align-items: center; gap: 6px; }
+
 .pair-card > .del.more { position: absolute; right: 8px; top: 8px; min-height: 36px; padding: 0 10px; font-size: 18px; }
 .pair-card .pair-del { flex-basis: 100%; }
-.pb-go { all: unset; position: relative; box-sizing: border-box; flex: none; display: inline-flex; align-items: center; gap: 4px; min-height: 32px; padding: 0 12px; border-radius: 99px; cursor: pointer; background: var(--chip); border: 1px solid var(--line-on-glass); font: 800 12.5px/1 var(--font-ui); color: var(--ink); }
-.pb-go::after { content: ""; position: absolute; inset: -6px -4px; }
-.pb-go i { font-style: normal; font-size: 17px; line-height: 1; margin-top: -1px; }
-.pb-go:active { transform: scale(.95); }
-.pb-go:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.goto-in { width: 100%; box-sizing: border-box; min-height: 52px; border-radius: 16px; border: 1px solid var(--line-strong); background: var(--chip); color: var(--ink); padding: 0 16px; font: 800 24px var(--font-ui); text-align: center; font-variant-numeric: tabular-nums; }
-.goto-in:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.goto-of { text-align: center; color: var(--muted); font: 600 13px var(--font-ui); margin: 8px 0 14px; }
-.goto-row { display: flex; gap: 8px; }
-.goto-row .btn { flex: 1; }
+
 @media (max-width: 350px) { .lib-actions .btn { font-size: 13px; gap: 6px; padding-inline: 8px; } .lib-actions .btn svg.i { width: 18px; height: 18px; } }
 .fld input.vh { width: 1px; min-height: 0; height: 1px; padding: 0; border: 0; }
 .seg.s4 { display: flex; }
 .seg.s4 button { flex: 1 1 auto; padding: 0 9px; font-size: 12.5px; }
 @media (max-width: 360px) { .seg.s4 button { padding: 0 5px; font-size: 12px; } }
+.cvs .cv { position: absolute; width: 98px; left: 0; top: 0; transition: transform .42s cubic-bezier(.2, .8, .2, 1), left .42s cubic-bezier(.2, .8, .2, 1), top .42s cubic-bezier(.2, .8, .2, 1), filter .3s; }
+.cvs { isolation: isolate; }
+.pair-card[data-sel="0"] .cv.c0, .pair-card[data-sel="1"] .cv.c1 { left: 0; top: 0; z-index: 2; transform: none; filter: none; }
+.pair-card[data-sel="0"] .cv.c1, .pair-card[data-sel="1"] .cv.c0 { left: 14px; top: 10px; z-index: 1; transform: rotate(4deg); filter: brightness(.86) saturate(.9); }
+.cvs .cv.ph.c1 { background: linear-gradient(155deg, var(--c3), var(--c2)); }
+.card-open { all: unset; position: absolute; inset: 0; z-index: 1; border-radius: inherit; cursor: pointer; }
+.card-open:focus-visible { outline: 2px solid var(--accent); outline-offset: -3px; }
+.book-meta > .langsw { position: relative; z-index: 2; display: grid; overflow: visible; white-space: normal; font-size: inherit; color: inherit; grid-template-columns: 1fr 1fr; margin-top: auto; height: 48px; padding: 4px; box-sizing: border-box; border-radius: 18px; background: var(--chip); border: 1px solid var(--line-on-glass); }
+.langsw::before { content: ""; position: absolute; top: 4px; bottom: 4px; left: 4px; width: calc(50% - 4px); border-radius: 14px; background: color-mix(in srgb, var(--c1) 46%, var(--chip)); box-shadow: 0 2px 8px var(--shade); transition: transform .32s cubic-bezier(.2, .8, .2, 1), background-color .3s; }
+.pair-card[data-sel="1"] .langsw::before { transform: translateX(100%); background: color-mix(in srgb, var(--c3) 46%, var(--chip)); }
+.sg { all: unset; position: relative; z-index: 1; box-sizing: border-box; display: flex; justify-content: center; align-items: center; gap: 6px; cursor: pointer; border-radius: 14px; -webkit-tap-highlight-color: transparent; }
+.sg:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.book-meta .sg b { display: block; -webkit-line-clamp: unset; font: 800 15px/1 var(--font-ui); letter-spacing: .02em; color: var(--muted); transition: color .2s; }
+.sg em { font: 700 11px/1 var(--font-ui); font-style: normal; color: var(--muted); }
+.sg[aria-checked="true"] b { color: var(--ink); }
+.sg[aria-checked="true"] em { color: var(--ink); opacity: .75; }
+.pair-card > .del.more { z-index: 2; }
+.pair-card .pair-del { position: relative; z-index: 2; }
+/* reading: the page number is a field in the bar */
+.pb-go { position: relative; box-sizing: border-box; flex: none; display: inline-flex; align-items: center; gap: 8px; min-height: 32px; padding: 0 4px 0 12px; border-radius: 99px; cursor: text; background: var(--chip); border: 1px solid var(--line-on-glass); font: 800 12.5px/1 var(--font-ui); color: var(--ink); }
+.pb-go::after { content: ""; position: absolute; inset: -6px -4px; }
+.pb-go input { all: unset; position: relative; z-index: 1; box-sizing: border-box; width: var(--w, 3ch); min-width: 38px; height: 24px; padding: 0 8px; border-radius: 99px; text-align: center; background: color-mix(in srgb, var(--accent) 18%, transparent); font: 800 13px/24px var(--font-ui); font-variant-numeric: tabular-nums; color: var(--ink); caret-color: var(--accent); -webkit-user-select: text; user-select: text; }
+.pb-go:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
+.pb-go:focus-within input { background: color-mix(in srgb, var(--accent) 30%, transparent); }
 </style>
 <div class="bg" aria-hidden="true"></div>
 <link rel="manifest" href="manifest.webmanifest">
@@ -632,7 +635,7 @@ body.boot .lib-hero, body.boot .sec-h, body.boot .book-card, body.boot .empty, b
       <button class="icon-btn" id="b-aa" aria-label="Шрифт и настройки"><span class="aa">Aa</span></button>
     </header>
     <footer class="rbar rbot glass" id="r-bot">
-      <div class="pb-row"><button class="pb-info" id="pb-info" aria-label="Страницы или проценты: нажми, чтобы переключить"><span id="pb-l"></span></button><button class="pb-go" id="pb-go" aria-label="Перейти на страницу">К странице<i aria-hidden="true">›</i></button></div>
+      <div class="pb-row"><button class="pb-info" id="pb-info" aria-label="Страницы или проценты: нажми, чтобы переключить"><span id="pb-l"></span></button><label class="pb-go" id="pb-go"><span>К странице</span><input id="pb-n" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="go" aria-label="Перейти на страницу: введи номер и нажми «Готово»"></label></div>
       <div class="pb-track" id="pb-track" role="slider" tabindex="0" aria-label="Положение в книге" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i class="pb-fill" id="pb-fill"></i><b class="pb-thumb" id="pb-thumb"></b></div>
     </footer>
   </section>
@@ -1482,17 +1485,31 @@ function bookCard(b, sample, bi) {
   return `<div class="book-card" data-id="${esc(b.id)}"><button class="book-open" ${attr}="${esc(b.id)}">${coverHtml(b)}<span class="book-meta"><b>${esc(b.title)}</b><span class="au">${esc(b.author || '')}</span><span class="meta-foot"><span class="tags"><span class="tag">${esc((b.tag || b.format || '').toUpperCase())}</span>${b.pair ? '<span class="tag" title="Есть параллельная книга">⇄ ' + esc(b.pairTitle ? String(b.pairTitle).slice(0, 18) : 'пара') + '</span>' : ''}<span class="pct">${state}</span></span>${sample ? '' : `<span class="bar"><i style="width:${pct}%"></i></span>`}</span></span></button>${sample || bi ? '' : `<button class="del" data-del="${esc(b.id)}" aria-label="Удалить книгу ${esc(b.title)}">Удалить</button>`}</div>`;
 }
 const langTag = m => ({ en: 'EN', ru: 'RU', ar: 'AR', latin: 'EN' }[m.lang] || String(m.lang || '··').toUpperCase().slice(0, 2));
-/* two versions of one book are a single row: a monogram, the title, and a button per language that opens that version */
+/* two versions of one book are a single card: both covers, one switch (EN | RU); the chosen language's cover is in front and the whole card opens that version */
+function pairSel(x, y) {   // 0 = x, 1 = y: the one read last, or switched to last
+  const sv = ls.get('rd.pairsel', {}) || {}, e = sv[x.id];
+  const score = m => Math.max(m.openedAt || 0, e && e.id === m.id ? e.at || 0 : 0);
+  return score(y) > score(x) ? 1 : 0;
+}
 function pairCard(a, b, bi) {
   const rank = m => ({ en: 0, latin: 0, ru: 1 }[m.lang] ?? 2);
   const [x, y] = rank(a) <= rank(b) ? [a, b] : [b, a];
   const pct = m => Math.round((m.progress || 0) * 100);
   const attr = bi ? 'data-bi' : 'data-open';
   const name = m => ({ en: 'английском', ru: 'русском', ar: 'арабском', latin: 'английском' }[m.lang] || 'этом языке');
-  const pill = m => `<button type="button" class="lp" ${attr}="${esc(m.id)}" aria-label="Читать на ${name(m)}${pct(m) ? ', прочитано ' + pct(m) + '%' : ''}"><i style="--p:${pct(m)}%"></i><b>${langTag(m)}</b><em>${pct(m) ? pct(m) + '%' : '—'}</em></button>`;
+  const sel = pairSel(x, y), cur = sel ? y : x;
+  const seg = (m, i) => `<button type="button" class="sg" role="radio" aria-checked="${i === sel}" data-sw="${esc(m.id)}" data-i="${i}" data-name="${name(m)}" aria-label="Читать на ${name(m)}${pct(m) ? ', прочитано ' + pct(m) + '%' : ''}"><b>${langTag(m)}</b><em>${pct(m) ? pct(m) + '%' : '—'}</em></button>`;
   const del = bi ? '' : `<button type="button" class="del more" data-more aria-expanded="false" aria-label="Ещё">⋯</button><div class="pair-del"><div><button type="button" class="del" data-del="${esc(x.id)}" data-lbl="Удалить ${langTag(x)}">Удалить ${langTag(x)}</button><button type="button" class="del" data-del="${esc(y.id)}" data-lbl="Удалить ${langTag(y)}">Удалить ${langTag(y)}</button></div></div>`;
-  const cvs = x.cover || y.cover ? `<span class="cvs" aria-hidden="true">${y.cover ? coverHtml(y, 'back') : ''}${coverHtml(x.cover ? x : y, 'front')}</span>` : `<span class="cvs" aria-hidden="true">${coverHtml(x, 'front')}</span>`;
-  return `<div class="book-card pair-card" data-id="${esc(x.id)}">${cvs}<span class="book-meta"><b>${esc(x.title)}</b><span class="au">${esc(x.author || y.author || '')}</span><span class="langpick" role="group" aria-label="Язык чтения">${pill(x)}${pill(y)}</span></span>${del}</div>`;
+  return `<div class="book-card pair-card" data-id="${esc(x.id)}" data-sel="${sel}"><button type="button" class="card-open" ${attr}="${esc(cur.id)}" aria-label="Открыть «${esc(x.title)}» на ${name(cur)}"></button><span class="cvs" aria-hidden="true">${coverHtml(x, 'c0')}${coverHtml(y, 'c1')}</span><span class="book-meta"><b>${esc(x.title)}</b><span class="au">${esc(x.author || y.author || '')}</span><span class="langsw" role="radiogroup" aria-label="Язык чтения">${seg(x, 0)}${seg(y, 1)}</span></span>${del}</div>`;
+}
+function pairSwitch(btn) {
+  const card = btn.closest('.pair-card'), o = card && card.querySelector('.card-open'); if (!o) return;
+  const id = btn.getAttribute('data-sw'), attr = o.hasAttribute('data-bi') ? 'data-bi' : 'data-open';
+  card.setAttribute('data-sel', btn.getAttribute('data-i') === '1' ? '1' : '0');
+  card.querySelectorAll('[data-sw]').forEach(b => b.setAttribute('aria-checked', String(b === btn)));
+  o.setAttribute(attr, id);
+  o.setAttribute('aria-label', 'Открыть «' + card.querySelector('.book-meta > b').textContent + '» на ' + btn.getAttribute('data-name'));
+  const sv = ls.get('rd.pairsel', {}) || {}; sv[card.getAttribute('data-id')] = { id, at: Date.now() }; ls.set('rd.pairsel', sv);
 }
 /* the list as cards: a book whose partner is in the same list becomes one pair card */
 function cardsFor(list, bi) {
@@ -1520,6 +1537,8 @@ async function renderLibrary() {
 }
 const delTimers = new Map();
 document.addEventListener('click', async e => {
+  const sw = e.target.closest ? e.target.closest('[data-sw]') : null;
+  if (sw) { pairSwitch(sw); return; }
   const more = e.target.closest ? e.target.closest('[data-more]') : null;
   if (more) { const c = more.closest('.pair-card'); const on = !c.classList.contains('open'); c.classList.toggle('open', on); more.setAttribute('aria-expanded', String(on)); return; }
   const t = e.target.closest ? e.target.closest('[data-open],[data-sample],[data-bi],[data-del]') : null;
@@ -1860,7 +1879,7 @@ const fmtPct = v => (v < 10 && v > 0 ? v.toFixed(1) : String(Math.round(v))).rep
 function updateProgress() {
   if (!R.book || views.reader.hidden) return;
   const s = pageState();
-  R.ps = s;
+  R.ps = s; pbSync(s);
   if (P.pbPct) {
     const pct = s.cur / s.N * 100;
     $('#pb-l').innerHTML = 'Прочитано <b>' + fmtPct(pct) + '</b>';
@@ -4256,20 +4275,29 @@ function gotoPageNo(n) {
   else { quiet(600); scroller.scrollTop = (n - 1) * scroller.clientHeight; }
   noteAnchor(); updateProgress(); persistSoon();
 }
-function openGoto() {
-  if (!R.book || views.reader.hidden) return;
-  const s = pageState();
-  const html = `<h2>Перейти на страницу <button class="icon-btn" data-close aria-label="Закрыть">${ICON.close}</button></h2>
-    <form id="goto-f" autocomplete="off" novalidate><input class="goto-in" id="goto-n" type="number" inputmode="numeric" pattern="[0-9]*" min="1" max="${s.N}" value="${s.cur}" aria-label="Номер страницы" enterkeyhint="go"><div class="goto-of">из ${s.N}</div>
-    <div class="goto-row"><button type="button" class="btn btn-soft" data-close>Отмена</button><button type="submit" class="btn btn-primary">Перейти</button></div></form>`;
-  openPanel(html, p => {
-    const f = $('#goto-f', p), inp = $('#goto-n', p);
-    p.onclick = e => { if (e.target.closest('[data-close]')) closePanel(); };
-    f.onsubmit = e => { e.preventDefault(); const n = parseInt(inp.value, 10); if (!n) { inp.focus(); return; } closePanel(); gotoPageNo(n); };
-    inp.focus(); inp.select();
-  }, { noFocus: true });
+/* the number of the page is a small field in the bar itself: it follows the reading, and a number typed into it takes the reader there */
+let pbWas = null;   // what the field showed when typing began
+function pbSync(s) {
+  const n = $('#pb-n'); if (!n || document.activeElement === n) return;
+  n.value = String(s.cur);
+  n.style.setProperty('--w', Math.max(2, String(s.N).length) + 'ch');
 }
-$('#pb-go').addEventListener('click', openGoto);
+(() => {
+  const n = $('#pb-n'); if (!n) return;
+  n.addEventListener('focus', () => { pbWas = n.value; setTimeout(() => { try { n.select(); } catch { /* not selectable */ } }, 0); });
+  n.addEventListener('input', () => { const v = n.value.replace(/\D/g, '').slice(0, 6); if (v !== n.value) n.value = v; });
+  n.addEventListener('keydown', e => {
+    e.stopPropagation();
+    if (e.key === 'Enter') { e.preventDefault(); n.blur(); }
+    else if (e.key === 'Escape') { e.preventDefault(); n.value = pbWas == null ? n.value : pbWas; n.blur(); }
+  });
+  n.addEventListener('blur', () => {
+    const v = parseInt(n.value, 10), was = pbWas; pbWas = null;
+    if (!R.book || views.reader.hidden) return;
+    if (!v || String(v) === was) { updateProgress(); return; }
+    gotoPageNo(v);
+  });
+})();
 /* ---------- covers: a small picture for every book, taken from the file itself ---------- */
 const COVER_W = 300, COVER_H = 450;
 async function thumbOf(blob) {
@@ -4846,7 +4874,7 @@ function init() {
   }
 }
 init();
-if (window.__RD_TEST) window.__rd = { idb, gotoPageNo, openGoto, coverFor, thumbOf, backfillCovers, anchorKnots, chapterGroups, learnLexicon, alignGlobal, alignSeq, chapterPlan, buildAnchors, alignBooks, mmWord, mmSentence, mmChunks, ggWord, ggSentence, ggCall, mtWord, mtSentence, dictWord, dictForms, dictParse, dictImport, dictClear, dictLoad, dictSenses, parseTable, parseStarDict, errCopy, eng, findInBook, jumpToHit, tocCurrent, wakeState: () => !!wakeLock, wakeSync, FIND, R, BI, setParallel, exportAligned, anchorNow, restoreAnchor, goSpread, turn, relayoutKeep, pageState, setChrome, gotoChapter, pairLocate, sentencesOf, buildIndex, pxFrom, alignBooks, ensurePair, windowAt, extractFlat, alignSeq, bookLang, parseBook, importFile, P, API, Keys, eng, S: () => S };
+if (window.__RD_TEST) window.__rd = { idb, gotoPageNo, pairSwitch, coverFor, thumbOf, backfillCovers, anchorKnots, chapterGroups, learnLexicon, alignGlobal, alignSeq, chapterPlan, buildAnchors, alignBooks, mmWord, mmSentence, mmChunks, ggWord, ggSentence, ggCall, mtWord, mtSentence, dictWord, dictForms, dictParse, dictImport, dictClear, dictLoad, dictSenses, parseTable, parseStarDict, errCopy, eng, findInBook, jumpToHit, tocCurrent, wakeState: () => !!wakeLock, wakeSync, FIND, R, BI, setParallel, exportAligned, anchorNow, restoreAnchor, goSpread, turn, relayoutKeep, pageState, setChrome, gotoChapter, pairLocate, sentencesOf, buildIndex, pxFrom, alignBooks, ensurePair, windowAt, extractFlat, alignSeq, bookLang, parseBook, importFile, P, API, Keys, eng, S: () => S };
 })();
 </script>
 
