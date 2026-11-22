@@ -1,1 +1,44 @@
-Svg
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Bilingual open book app icon">
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#080D3D"/><stop offset=".52" stop-color="#17105C"/><stop offset="1" stop-color="#350D52"/></linearGradient>
+  <linearGradient id="left" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#8CEBFF"/><stop offset=".45" stop-color="#2878FF"/><stop offset="1" stop-color="#1826A8"/></linearGradient>
+  <linearGradient id="right" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#FFE6A1"/><stop offset=".48" stop-color="#FF8A39"/><stop offset="1" stop-color="#D92769"/></linearGradient>
+  <linearGradient id="paper" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#FFFFFF"/><stop offset="1" stop-color="#F2EAFB"/></linearGradient>
+  <linearGradient id="ribbon" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#42DFFF"/><stop offset=".48" stop-color="#8278FF"/><stop offset="1" stop-color="#FFD45C"/></linearGradient>
+  <filter id="shadow" x="-30%" y="-30%" width="160%" height="170%"><feGaussianBlur stdDeviation="12"/></filter>
+  <clipPath id="flagL"><rect x="148" y="174" width="83" height="49" rx="8"/></clipPath>
+  <clipPath id="flagR"><rect x="281" y="174" width="83" height="49" rx="8"/></clipPath>
+</defs>
+<rect width="512" height="512" rx="112" fill="url(#bg)"/>
+<path d="M52 165C52 96 99 57 170 57h172c71 0 118 39 118 108v188c0 68-48 102-120 102H172C99 455 52 421 52 353Z" fill="none" stroke="url(#left)" stroke-width="5" opacity=".55"/>
+<path d="M256 110C208 108 145 122 105 149l-5 216c47-27 105-35 156-22Z" fill="#1E65E8" opacity=".48"/>
+<path d="M256 110c48-2 111 12 151 39l5 216c-47-27-105-35-156-22Z" fill="#F15B58" opacity=".38"/>
+<path d="M112 147c43-18 94-17 144 3v210c-49-20-99-21-144-2Z" fill="url(#left)" opacity=".95"/>
+<path d="M400 147c-43-18-94-17-144 3v210c49-20 99-21 144-2Z" fill="url(#right)" opacity=".95"/>
+<ellipse cx="256" cy="371" rx="160" ry="24" fill="#03072D" opacity=".48" filter="url(#shadow)"/>
+<path d="M110 137c46-17 97-10 146 13v214c-45-21-98-26-146-8-10 4-17-3-17-13V159c0-10 6-18 17-22Z" fill="url(#paper)" stroke="#D8D5F4" stroke-width="2"/>
+<path d="M402 137c-46-17-97-10-146 13v214c45-21 98-26 146-8 10 4 17-3 17-13V159c0-10-6-18-17-22Z" fill="url(#paper)" stroke="#F4D5D3" stroke-width="2"/>
+<path d="M256 150v214" stroke="#FFCB7A" stroke-width="4" stroke-linecap="round"/>
+<g clip-path="url(#flagL)">
+ <rect x="148" y="174" width="83" height="49" fill="#173A8A"/>
+ <path d="M145 171l90 55M235 171l-90 55" stroke="#FFF" stroke-width="13"/>
+ <path d="M145 171l90 55M235 171l-90 55" stroke="#E93455" stroke-width="5"/>
+ <path d="M189 170v57M145 198h90" stroke="#FFF" stroke-width="17"/>
+ <path d="M189 170v57M145 198h90" stroke="#E93455" stroke-width="8"/>
+</g>
+<g clip-path="url(#flagR)">
+ <rect x="281" y="174" width="83" height="16.4" fill="#FFF"/>
+ <rect x="281" y="190.4" width="83" height="16.3" fill="#2451D8"/>
+ <rect x="281" y="206.7" width="83" height="16.3" fill="#E94354"/>
+</g>
+<g fill="#AAA4C9">
+ <path d="M139 245q42-10 86 7" fill="none" stroke="#AAA4C9" stroke-width="9" stroke-linecap="round"/>
+ <path d="M137 267q44-8 88 9" fill="none" stroke="#AAA4C9" stroke-width="9" stroke-linecap="round"/>
+ <path d="M136 289q30-5 61 5" fill="none" stroke="#AAA4C9" stroke-width="9" stroke-linecap="round"/>
+ <path d="M287 252q43-17 86-7" fill="none" stroke="#AAA4C9" stroke-width="9" stroke-linecap="round"/>
+ <path d="M287 276q43-17 88-8" fill="none" stroke="#AAA4C9" stroke-width="9" stroke-linecap="round"/>
+ <path d="M287 300q31-10 63-7" fill="none" stroke="#AAA4C9" stroke-width="9" stroke-linecap="round"/>
+</g>
+<path d="M42 307c49-53 112-68 171-52 42 12 70 43 112 39 55-5 90-47 130-79" fill="none" stroke="url(#ribbon)" stroke-width="13" stroke-linecap="round"/>
+<path d="M42 307c49-53 112-68 171-52 42 12 70 43 112 39 55-5 90-47 130-79" fill="none" stroke="#FFFFFF" stroke-width="2" opacity=".45" stroke-linecap="round"/>
+</svg>
