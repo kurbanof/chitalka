@@ -585,11 +585,96 @@ body.boot .lib-hero, body.boot .sec-h, body.boot .book-card, body.boot .empty, b
 .pb-go input { all: unset; position: relative; z-index: 1; box-sizing: border-box; width: var(--w, 3ch); min-width: 38px; height: 24px; padding: 0 8px; border-radius: 99px; text-align: center; background: color-mix(in srgb, var(--accent) 18%, transparent); font: 800 13px/24px var(--font-ui); font-variant-numeric: tabular-nums; color: var(--ink); caret-color: var(--accent); -webkit-user-select: text; user-select: text; }
 .pb-go:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
 .pb-go:focus-within input { background: color-mix(in srgb, var(--accent) 30%, transparent); }
+
+/* ---------- statistics tab ---------- */
+.tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; margin-top: 14px; padding: 3px; border-radius: 999px; background: var(--chip); }
+.tabs button { min-height: 42px; border: 0; border-radius: 999px; background: transparent; color: var(--ink-3); font: 800 14px var(--font-ui); display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: background-color .22s, color .22s, box-shadow .22s; }
+.tabs button[aria-selected="true"] { background: var(--glass-strong); color: var(--ink); box-shadow: 0 1px 4px var(--shade), inset 0 1px 0 var(--hl); }
+.tab-n { display: inline-flex; align-items: center; gap: 2px; font: 800 12.5px var(--font-ui); color: var(--accent-ink); }
+.tab-n:empty { display: none; }
+.tab-n svg { width: 15px; height: 15px; fill: currentColor; stroke: none; }
+#lib-stats { display: grid; gap: 12px; margin-top: 14px; padding-bottom: 28px; }
+#lib-stats[hidden] { display: none; }
+#lib-stats .sec-h { margin: 14px 4px -2px; }
+.st-streak { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 2px 14px; }
+.st-fl { grid-row: span 2; width: 58px; height: 58px; border-radius: 50%; display: grid; place-items: center; background: var(--chip); color: var(--ink-3); }
+.st-fl svg { width: 30px; height: 30px; fill: currentColor; stroke: none; }
+.st-fl.on { background: color-mix(in srgb, var(--accent) 22%, transparent); color: var(--accent); }
+.st-sk { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
+.st-sk b { font: 800 40px/1 var(--font-ui); letter-spacing: -.02em; }
+.st-sk span { font: 700 15px var(--font-ui); color: var(--ink-2); }
+.st-best { align-self: start; padding: 5px 10px; border-radius: 99px; background: var(--chip); font: 700 12px var(--font-ui); color: var(--ink-2); white-space: nowrap; }
+@media (max-width: 360px) { .st-best { display: none; } .st-streak { grid-template-columns: auto 1fr; } }
+.st-cap { grid-column: 2 / -1; margin: 0; font-size: 13.5px; line-height: 1.4; color: var(--ink-2); }
+.st-h { margin: 0 0 6px; font: 800 12px/1.2 var(--font-ui); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
+.st-plan p { margin: 6px 0 14px; font-size: 14px; line-height: 1.5; color: var(--ink-2); }
+.st-plan .btn { width: 100%; }
+.st-ph { display: flex; gap: 10px; align-items: center; justify-content: space-between; }
+.st-ph b { min-width: 0; font: 800 17px/1.3 var(--font-ui); overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.st-link { flex: none; min-height: 36px; padding: 0 14px; border: 0; border-radius: 99px; background: var(--chip); color: var(--ink); font: 700 13px var(--font-ui); }
+.st-goal { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 8px; margin-top: 14px; }
+.st-goal b { font: 800 38px/1 var(--font-ui); letter-spacing: -.02em; }
+.st-goal span { font: 700 14px var(--font-ui); color: var(--ink-2); }
+.st-done { margin-left: auto; display: inline-flex; align-items: center; gap: 4px; font: 800 12.5px var(--font-ui); font-style: normal; color: var(--accent-ink); }
+.st-done svg, .st-ok svg { width: 18px; height: 18px; stroke-width: 3; }
+.st-bar { height: 10px; margin-top: 10px; border-radius: 99px; background: var(--chip); overflow: hidden; }
+.st-bar i { display: block; height: 100%; border-radius: inherit; background: var(--accent); transition: width .6s cubic-bezier(.2, .8, .2, 1); }
+.st-plan p.st-sub { margin: 10px 0 0; font-size: 13px; color: var(--muted); }
+.st-plan p.st-ok { display: flex; align-items: center; gap: 8px; font-weight: 700; color: var(--accent-ink); }
+.st-week { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+.wk { display: flex; flex-direction: column; align-items: center; gap: 5px; min-height: 84px; padding: 8px 0 6px; border: 1px solid transparent; border-radius: 18px; background: transparent; color: var(--ink-3); font: 800 11.5px var(--font-ui); text-transform: uppercase; }
+.wk[aria-pressed="true"] { background: var(--glass-strong); border-color: var(--glass-border); color: var(--ink); box-shadow: 0 1px 4px var(--shade), inset 0 1px 0 var(--hl); }
+.wk.today .wk-d { color: var(--accent-ink); }
+.wk-bar { display: flex; align-items: flex-end; width: 14px; height: 42px; border-radius: 7px; background: var(--chip); overflow: hidden; }
+.wk-bar i { display: block; width: 100%; border-radius: 7px; background: var(--c2); }
+.wk.hit .wk-bar i { background: var(--accent); }
+.wk-ck { height: 14px; color: var(--accent-ink); }
+.wk-ck svg { width: 14px; height: 14px; stroke-width: 3.2; }
+.st-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.st-t { padding: 14px 16px; border-radius: 22px; }
+.st-t b { display: block; font: 800 30px/1.1 var(--font-ui); letter-spacing: -.02em; overflow-wrap: anywhere; }
+.st-t b small { margin-left: 4px; font: 700 14px var(--font-ui); letter-spacing: 0; color: var(--muted); }
+.st-t span { display: block; margin-top: 4px; font: 700 12.5px var(--font-ui); color: var(--muted); }
+.st-bks { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; max-height: 34vh; overflow-y: auto; overscroll-behavior: contain; margin: 6px -4px 0; padding: 4px; }
+.st-bk { display: flex; align-items: center; gap: 12px; width: 100%; min-width: 0; box-sizing: border-box; min-height: 64px; padding: 8px 14px 8px 8px; border: 1.5px solid transparent; border-radius: 18px; background: var(--chip); color: var(--ink); text-align: left; font: inherit; }
+.st-bk[aria-checked="true"] { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, transparent); }
+.cv.st-cv { width: 38px; border-radius: 8px; box-shadow: 0 0 0 1px var(--line-on-glass); }
+.cv.ph.st-cv { padding: 4px; justify-content: center; align-items: center; }
+.cv.ph.st-cv b { font-size: 17px; }
+.cv.ph.st-cv i { display: none; }
+.st-bt { flex: 1; min-width: 0; }
+.st-bt b { display: block; font: 700 14.5px/1.3 var(--font-ui); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.st-bt span { display: block; font-size: 12.5px; color: var(--muted); }
+.st-rd { flex: none; width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--line-strong); }
+.st-bk[aria-checked="true"] .st-rd { border-color: var(--accent); background: radial-gradient(circle, var(--accent) 0 44%, transparent 50%); }
+.st-days { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 8px; }
+.st-days input { width: 112px; min-height: 36px; box-sizing: border-box; border-radius: 99px; border: 1px solid var(--line-strong); background: var(--glass-strong); padding: 0 14px; text-align: center; font: 700 13px var(--font-ui); color: var(--ink); }
+.st-prev { margin: 14px 0 2px; font: 800 17px/1.3 var(--font-ui); color: var(--accent-ink); }
+.st-note { margin: 0 0 14px; font-size: 12.5px; line-height: 1.45; color: var(--muted); }
+.panel .btn.sure { background: var(--warn); color: var(--bg); border-color: transparent; }
+.goal { position: fixed; left: 50%; top: calc(env(safe-area-inset-top, 0px) + 14px); transform: translateX(-50%); z-index: 90; width: min(92vw, 26rem); }
+.goal[hidden] { display: none; }
+.goal-in { position: relative; display: flex; align-items: center; gap: 14px; padding: 14px 18px 14px 14px; border-radius: 26px; background: var(--paper); color: var(--ink); border: 1px solid var(--glass-border); box-shadow: 0 14px 38px var(--shade), 0 0 0 2px color-mix(in srgb, var(--accent) 45%, transparent); }
+.goal-ic { flex: none; width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; background: var(--accent); color: var(--on-accent); }
+.goal-ic svg { width: 26px; height: 26px; stroke-width: 3; }
+.goal-tx { min-width: 0; }
+.goal-tx b { display: block; font: 800 16px/1.25 var(--font-ui); }
+.goal-tx span { display: block; margin-top: 2px; font: 500 13.5px/1.4 var(--font-ui); color: var(--ink-2); }
+.goal-c { position: absolute; left: 37px; top: 50%; width: 0; height: 0; pointer-events: none; }
+.goal-c i { position: absolute; left: -3px; top: -5px; width: 7px; height: 11px; border-radius: 2px; background: var(--cc); opacity: 0; animation: goal-fly 1s cubic-bezier(.15, .7, .3, 1) var(--dl) both; }
+@keyframes goal-in { from { opacity: 0; transform: translateY(-22px) scale(.94); } to { opacity: 1; transform: none; } }
+@keyframes goal-out { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateY(-14px) scale(.96); } }
+@keyframes goal-badge { 0% { transform: scale(.3); } 60% { transform: scale(1.18); } 100% { transform: scale(1); } }
+@keyframes goal-fly { 0% { opacity: 1; transform: translate(0, 0) rotate(0) scale(.5); } 80% { opacity: 1; } 100% { opacity: 0; transform: translate(var(--x), var(--y)) rotate(var(--r)) scale(1); } }
+.goal-in { animation: goal-in .5s cubic-bezier(.2, .9, .25, 1.1) both; }
+.goal-ic { animation: goal-badge .6s .12s cubic-bezier(.2, 1.3, .4, 1) both; }
+.goal.out .goal-in { animation: goal-out .25s ease-in both; }
+@media (prefers-reduced-motion: reduce) { .goal-in, .goal-ic, .goal-c i, .st-bar i, .tabs button { animation: none !important; transition: none !important; } .goal-c { display: none; } }
 </style>
 <div class="bg" aria-hidden="true"></div>
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Читалка">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -606,6 +691,8 @@ body.boot .lib-hero, body.boot .sec-h, body.boot .book-card, body.boot .empty, b
       <button class="icon-btn" id="b-set-lib" aria-label="Настройки и движок перевода"></button>
     </header>
     <div class="wrap">
+      <div class="tabs" id="lib-tabs" role="tablist" aria-label="Раздел"><button type="button" role="tab" data-tab="books" aria-selected="true">Книги</button><button type="button" role="tab" data-tab="stats" aria-selected="false">Статистика<span class="tab-n" id="tab-n"></span></button></div>
+      <div id="lib-main">
       <div class="lib-actions">
         <label class="btn btn-primary" for="file" id="open-lbl"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Открыть книгу</label>
         <label class="btn btn-soft" for="file-pair" id="open-pair-lbl"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h6a2 2 0 0 1 2 2v12a2 2 0 0 0-2-2H4zM20 5h-6a2 2 0 0 0-2 2v12a2 2 0 0 1 2-2h6z"/></svg>Две книги</label>
@@ -615,6 +702,8 @@ body.boot .lib-hero, body.boot .sec-h, body.boot .book-card, body.boot .empty, b
       <div id="lib-books"></div>
       <h2 class="sec-h">Примеры</h2>
       <div class="books" id="lib-samples"></div>
+      </div>
+      <div id="lib-stats" role="tabpanel" aria-label="Статистика" hidden></div>
     </div>
   </section>
 
@@ -660,6 +749,7 @@ body.boot .lib-hero, body.boot .sec-h, body.boot .book-card, body.boot .empty, b
 <div class="sheet" id="sheet" role="dialog" aria-label="Перевод" hidden><div class="sheet-in" id="sheet-in"></div></div>
 <div class="scrim" id="scrim" hidden><div class="panel" id="panel" role="dialog" aria-modal="true"></div></div>
 <div class="tour" id="tour" role="dialog" aria-modal="true" aria-labelledby="tour-h" hidden></div>
+<div class="goal" id="goal" role="status" aria-live="polite" hidden></div>
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 <input type="file" id="file" class="vh">
 <input type="file" id="file-pair" class="vh" multiple>
@@ -1461,6 +1551,7 @@ function show(v) {
   if (from === v) return;
   const quick = noMotion();
   if (v === 'lib') {
+    stRefresh();
     views.lib.classList.remove('under'); views.lib.inert = false;
     const A = views[from]; if (!A) return;
     if (quick) { finishSwap(); return; }
@@ -1630,7 +1721,7 @@ const isH = () => R.kind === 'text' && P.flip === 'h';
 const barTop = $('#r-top'), barBot = $('#r-bot');
 const setLoad = (on, msg) => { const l = $('#r-load'); l.hidden = !on; if (msg) l.textContent = msg; };
 /* scrolls we start ourselves must not count as the reader paging through the book */
-function quiet(ms = 350) { R.quiet = performance.now() + ms; }
+function quiet(ms = 350) { R.quiet = performance.now() + ms; stJump(); }
 function viewTop() { return scroller.getBoundingClientRect().top + (R.padT || 0); }
 
 async function openBook(book, meta) {
@@ -1879,7 +1970,7 @@ const fmtPct = v => (v < 10 && v > 0 ? v.toFixed(1) : String(Math.round(v))).rep
 function updateProgress() {
   if (!R.book || views.reader.hidden) return;
   const s = pageState();
-  R.ps = s; pbSync(s);
+  R.ps = s; pbSync(s); stProgress(s);
   if (P.pbPct) {
     const pct = s.cur / s.N * 100;
     $('#pb-l').innerHTML = 'Прочитано <b>' + fmtPct(pct) + '</b>';
@@ -1933,6 +2024,7 @@ $('#pb-info').addEventListener('click', () => { P.pbPct = !P.pbPct; savePrefs();
 const track = $('#pb-track');
 let seeking = false;
 function seekTo(clientX) {
+  stJump();
   const r = track.getBoundingClientRect(), q = clamp((clientX - r.left) / Math.max(1, r.width), 0, 1);
   R.hold = null;
   if (R.kind === 'pdf') { const N = R.book.doc.numPages; R.book.goto(Math.round(q * (N - 1)) + 1); }
@@ -4267,6 +4359,7 @@ new MutationObserver(wakeSync).observe(views.reader, { attributes: true, attribu
 
 /* a page typed in: any page of the book, counted the way the bar counts them */
 function gotoPageNo(n) {
+  stJump();
   const s = pageState();
   n = clamp(Math.round(n), 1, s.N);
   R.hold = null;
@@ -4288,7 +4381,7 @@ function pbSync(s) {
   n.addEventListener('input', () => { const v = n.value.replace(/\D/g, '').slice(0, 6); if (v !== n.value) n.value = v; });
   n.addEventListener('keydown', e => {
     e.stopPropagation();
-    if (e.key === 'Enter') { e.preventDefault(); n.blur(); }
+    if (e.key === 'Enter') { e.preventDefault(); setTimeout(() => n.blur(), 40); }   /* a moment later: the browser gives the focus back to a field that is left in the middle of a key press */
     else if (e.key === 'Escape') { e.preventDefault(); n.value = pbWas == null ? n.value : pbWas; n.blur(); }
   });
   n.addEventListener('blur', () => {
@@ -4390,6 +4483,306 @@ async function backfillCovers() {
   if (changed && !views.lib.hidden) renderLibrary();
 }
 
+/* ---------- statistics: pages, time, new words, a streak and a reading plan — all kept on this device ---------- */
+const ST_KEY = 'rd.stats', ST_SEEN = 'rd.seen';
+const ST_MIN = 5;                       // with no plan, a day counts for the streak at this many pages
+ICON.flame = '<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12.3 2.2c.6 3.2 3.2 4.7 4.6 7.6 1.1 2.4 1 5.3-.8 7.5A6.2 6.2 0 0 1 12 20.2a6.2 6.2 0 0 1-4.7-2.1c-1.5-1.8-1.7-4.2-.7-6.3.4-.8.9-1.4 1.5-2 .2 1.2.7 2 1.6 2.4-.5-3.8.7-7.6 2.6-10z"/><path fill="#fff" fill-opacity=".55" d="M12 20.2a3.3 3.3 0 0 1-3.3-3.3c0-1.5.9-2.5 1.7-3.4.4.9 1 1.3 1.7 1.4.4-1.2 1-2 1.7-2.7.5 1.1.9 2 .9 3a3.3 3.3 0 0 1-2.7 5z"/></svg>';
+const stNow = () => (window.__RD_NOW ? window.__RD_NOW() : Date.now());
+const st2 = n => String(n).padStart(2, '0');
+const stDay = t => { const d = new Date(t == null ? stNow() : t); return d.getFullYear() + '-' + st2(d.getMonth() + 1) + '-' + st2(d.getDate()); };
+const stDate = k => { const [y, m, d] = k.split('-').map(Number); return new Date(y, m - 1, d, 12); };
+const stAdd = (k, n) => { const d = stDate(k); d.setDate(d.getDate() + n); return stDay(d.getTime()); };
+const stDiff = (a, b) => Math.round((stDate(b) - stDate(a)) / 864e5);
+const stPl = (n, f) => { const a = Math.abs(n) % 100, b = a % 10; return a > 10 && a < 20 ? f[2] : b > 1 && b < 5 ? f[1] : b === 1 ? f[0] : f[2]; };
+const stDur = s => { const m = Math.round((s || 0) / 60), u = x => '<small>' + x + '</small>'; return m < 60 ? m + u('мин') : Math.floor(m / 60) + u('ч') + ' ' + st2(m % 60) + u('мин'); };
+const ST = { tab: 'books', sel: '', bk: null, hw: null, act: 0, bucket: 3, bt: 0, tt: 0, goalT: 0 };
+
+/* the data: days {p pages, s seconds, w new words, hit}, n page counts of the books seen, plan */
+let SD = null, stT = 0, SEEN = null, seenT = 0;
+function stLoad() {
+  if (SD) return SD;
+  const s = ls.get(ST_KEY, null) || {};
+  SD = { days: s.days && typeof s.days === 'object' ? s.days : {}, n: s.n && typeof s.n === 'object' ? s.n : {}, plan: s.plan && typeof s.plan === 'object' && s.plan.id ? s.plan : null };
+  const cut = stAdd(stDay(), -800);
+  for (const k of Object.keys(SD.days)) if (k < cut) delete SD.days[k];
+  if (SD.plan && !Array.isArray(SD.plan.ids)) SD.plan.ids = [SD.plan.id];
+  return SD;
+}
+function stSave(now) {
+  clearTimeout(stT); stT = 0;
+  if (!SD) return;
+  if (now) ls.set(ST_KEY, SD); else stT = setTimeout(() => { stT = 0; ls.set(ST_KEY, SD); }, 700);
+}
+function stReset() { clearTimeout(stT); stT = 0; SD = null; SEEN = null; ST.bk = null; ST.hw = null; ls.set(ST_KEY, null); ls.set(ST_SEEN, null); }
+const stSeen = () => SEEN || (SEEN = new Set((() => { const a = ls.get(ST_SEEN, []); return Array.isArray(a) ? a : []; })()));
+/* the plan's picture of today: where the book stood when the day began (so the goal does not shrink while you read) */
+function stRoll(now) {
+  const P = stLoad().plan; if (!P) return;
+  const t = stDay(now);
+  if (!P.snap || P.snap.d !== t) P.snap = { d: t, q: typeof P.q === 'number' ? P.q : (P.q0 || 0) };
+}
+/* pages to read today: the plan's share, or the small default */
+function stGoal(t) {
+  const D = stLoad(), P = D.plan; t = t || stDay();
+  if (!P || P.done) return { plan: false, need: ST_MIN };
+  stRoll();
+  if (!(P.N > 1)) return { plan: true, unknown: true, need: ST_MIN };
+  const left = Math.max(0, (1 - P.snap.q) * P.N), dl = Math.max(1, P.days - stDiff(P.start, t));
+  return { plan: true, need: Math.max(1, Math.ceil(left / dl - 1e-6)), left, daysLeft: dl };
+}
+function stAnki(k) {
+  let n = 0;
+  try { for (const w of Coll.all()) if (w.createdAt && stDay(w.createdAt) === k) n++; } catch { /* no collection yet */ }
+  return n;
+}
+function stStreak() {
+  const D = stLoad(), t = stDay(), hit = k => !!(D.days[k] && D.days[k].hit);
+  let k = hit(t) ? t : stAdd(t, -1), n = 0;
+  while (hit(k)) { n++; k = stAdd(k, -1); }
+  let best = 0, run = 0, prev = null;
+  for (const d of Object.keys(D.days).sort()) {
+    if (!D.days[d].hit) continue;
+    run = prev && stDiff(prev, d) === 1 ? run + 1 : 1; prev = d; if (run > best) best = run;
+  }
+  return { n, best: Math.max(best, n), today: hit(t) };
+}
+
+/* ----- tracking ----- */
+const stAct = () => { ST.act = stNow(); };
+/* A page counts as read when the reader moves forward by a few pages at a time while the screen is being used: jumps (contents, search, the slider) and flicks do not count */
+function stJump() { ST.hw = null; }
+function stProgress(s) {
+  if (!R.book || !R.meta || !(s.N > 1)) return;
+  const D = stLoad(), now = stNow(), t = stDay(now), id = R.meta.id;
+  stRoll(now);
+  if (ST.bk !== R.book) { ST.bk = R.book; ST.hw = null; }
+  ST.bucket = Math.min(4, ST.bucket + (now - ST.bt) / 2000); ST.bt = now;
+  const q = s.q, live = now - ST.act < 8000 && performance.now() >= R.quiet;
+  let credit = 0;
+  if (ST.hw == null || !live) ST.hw = q;
+  else if (q > ST.hw) {
+    const pg = (q - ST.hw) * s.N;
+    if (pg <= 3.2) { credit = Math.min(pg, ST.bucket); ST.bucket -= credit; }
+    ST.hw = q;
+  }
+  D.n[id] = s.N;
+  const P = D.plan, mine = !!(P && !P.done && P.ids.indexOf(id) >= 0);
+  let learned = false;
+  if (mine) { const had = P.N > 1; P.q = q; if (id === P.id || !had) P.N = s.N; learned = !had && P.N > 1; }
+  if (credit > 0) {
+    const row = D.days[t] || (D.days[t] = {});
+    row.p = (row.p || 0) + credit;
+    if (mine && q >= 0.985) { P.done = t; row.hit = 1; stBadge(); stCelebrate('book'); }
+  }
+  stCheckHit();
+  stSave();
+  if (learned) setTimeout(() => toast('План готов: ' + stGoal().need + ' стр. в день', 4500), 900);
+}
+function stCheckHit() {
+  const D = stLoad(), t = stDay(), row = D.days[t];
+  if (!row || row.hit) return;
+  const g = stGoal(t);
+  if (Math.round(row.p || 0) >= g.need) { row.hit = 1; stBadge(); stCelebrate(g.plan && !g.unknown ? 'plan' : 'day'); }
+}
+function stTick() {
+  const now = stNow(), dt = Math.min(6000, now - (ST.tt || now)); ST.tt = now;
+  if (dt <= 0 || curView !== 'reader' || document.hidden || !R.book || now - ST.act > 120000) return;
+  stRoll(now);
+  const D = stLoad(), t = stDay(now), row = D.days[t] || (D.days[t] = {});
+  row.s = (row.s || 0) + dt / 1000;
+  stSave();
+}
+/* a word counts as new the first time it is looked up (its dictionary form, so "went" and "go" are one word) */
+function stWord(word, lemma) {
+  const k = normKey(lemma || word); if (!k || k.length > 60) return;
+  const seen = stSeen(); if (seen.has(k)) return;
+  seen.add(k);
+  clearTimeout(seenT); seenT = setTimeout(() => ls.set(ST_SEEN, [...seen]), 500);
+  const D = stLoad(), t = stDay(), row = D.days[t] || (D.days[t] = {});
+  row.w = (row.w || 0) + 1;
+  stSave();
+}
+
+/* ----- the goal reached: a small friendly card with a burst of confetti ----- */
+const stLine = sk => (sk.n >= 2 ? 'Стрик: ' + sk.n + ' ' + stPl(sk.n, ['день', 'дня', 'дней']) + ' подряд.' : 'Стрик начался — приходи завтра.');
+function stHideGoal() {
+  const el = $('#goal'); if (!el || el.hidden) return;
+  clearTimeout(ST.goalT);
+  if (noMotion()) { el.hidden = true; return; }
+  el.classList.add('out'); ST.goalT = setTimeout(() => { el.hidden = true; el.classList.remove('out'); }, 260);
+}
+function stCelebrate(kind) {
+  const el = $('#goal'); if (!el) return;
+  const D = stLoad(), sk = stStreak(), got = Math.round((D.days[stDay()] || {}).p || 0);
+  let t, s;
+  if (kind === 'book') { t = 'Книга прочитана!'; s = '«' + (D.plan ? D.plan.title : '') + '» — ты дошёл до конца. Поздравляю!'; }
+  else if (kind === 'plan') { t = 'Цель на сегодня достигнута!'; s = 'Прочитано ' + got + ' стр. ' + stLine(sk); }
+  else { t = 'День засчитан!'; s = 'Прочитано ' + got + ' стр. ' + stLine(sk); }
+  let conf = '';
+  if (!noMotion()) {
+    const col = ['var(--accent)', 'var(--c1)', 'var(--c2)', 'var(--c3)', '#6FA77A', '#D9777F'];
+    for (let i = 0; i < 16; i++) {
+      const a = (i / 16) * Math.PI * 2 + (i % 3) * 0.12, r = 52 + (i * 37 % 46);
+      conf += `<i style="--x:${Math.round(Math.cos(a) * r)}px;--y:${Math.round(Math.sin(a) * r - 14)}px;--r:${(i * 83) % 360}deg;--dl:${(i % 4) * 40}ms;--cc:${col[i % col.length]}"></i>`;
+    }
+  }
+  clearTimeout(ST.goalT);
+  el.classList.remove('out');
+  el.innerHTML = `<div class="goal-in"><span class="goal-ic">${ICON.check}</span><span class="goal-tx"><b>${esc(t)}</b><span>${esc(s)}</span></span><span class="goal-c" aria-hidden="true">${conf}</span></div>`;
+  el.hidden = false;
+  ST.goalT = setTimeout(stHideGoal, 5600);
+  if (ST.tab === 'stats' && curView === 'lib') stRender();
+}
+
+/* ----- the tab ----- */
+function stBadge() {
+  const n = $('#tab-n'); if (!n) return;
+  const sk = stStreak();
+  n.innerHTML = sk.n > 0 ? ICON.flame + '<span>' + sk.n + '</span>' : '';
+  n.setAttribute('aria-label', sk.n > 0 ? 'Стрик: ' + sk.n + ' ' + stPl(sk.n, ['день', 'дня', 'дней']) : '');
+}
+function stTab(t) {
+  ST.tab = t === 'stats' ? 'stats' : 'books';
+  const s = ST.tab === 'stats';
+  $('#lib-main').hidden = s; $('#lib-stats').hidden = !s;
+  for (const b of $$('#lib-tabs [data-tab]')) b.setAttribute('aria-selected', String(b.dataset.tab === ST.tab));
+  if (s) { ST.sel = stDay(); stRender(); try { scrollTo(0, 0); } catch { /* ignore */ } }
+}
+function stRefresh() { stBadge(); if (ST.tab === 'stats') stRender(); }
+const stMon = ['янв', 'фев', 'мар', 'апр', 'мая', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'];
+const stWd = ['вс', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб'];
+function stDayName(k, today) {
+  if (k === today) return 'Сегодня';
+  if (k === stAdd(today, -1)) return 'Вчера';
+  const d = stDate(k);
+  return stWd[d.getDay()] + ', ' + d.getDate() + ' ' + stMon[d.getMonth()];
+}
+function stPlanCard(D, g, got) {
+  const P = D.plan, h = '<h3 class="st-h">План чтения</h3>';
+  if (!P) return `<section class="card st-plan">${h}<p>Выбери книгу и срок — я посчитаю, сколько страниц читать каждый день.</p><button class="btn btn-primary" data-st="plan">Составить план</button></section>`;
+  const head = `<div class="st-ph"><b>${esc(P.title)}</b><button class="st-link" data-st="plan">Изменить</button></div>`;
+  if (P.done) {
+    const n = stDiff(P.start, P.done) + 1;
+    return `<section class="card st-plan">${h}${head}<p class="st-ok">${ICON.check}<span>Книга прочитана за ${n} ${stPl(n, ['день', 'дня', 'дней'])}.</span></p><button class="btn btn-soft" data-st="plan">Новый план</button></section>`;
+  }
+  if (g.unknown) return `<section class="card st-plan">${h}${head}<p>Открой книгу один раз — я посчитаю страницы и назову цель на день.</p><button class="btn btn-primary" data-st="open">Открыть книгу</button></section>`;
+  const reached = got >= g.need, pct = Math.min(100, Math.round(got / g.need * 100)), q = Math.round((P.q || 0) * 100);
+  const left = Math.max(0, Math.round((1 - (P.q || 0)) * P.N)), over = stDiff(P.start, stDay()) >= P.days;
+  const sub = over ? 'Срок вышел. Осталось ' + left + ' стр. — можно продлить план.' : 'Осталось ' + left + ' стр. · ' + g.daysLeft + ' ' + stPl(g.daysLeft, ['день', 'дня', 'дней']) + ' · книга прочитана на ' + q + '%';
+  return `<section class="card st-plan">${h}${head}<div class="st-goal"><b>${got}</b><span>из ${g.need} стр. сегодня</span>${reached ? '<em class="st-done">' + ICON.check + 'Цель выполнена</em>' : ''}</div><div class="st-bar${reached ? ' full' : ''}" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${pct}" aria-label="Цель на сегодня"><i style="width:${pct}%"></i></div><p class="st-sub">${esc(sub)}</p></section>`;
+}
+function stRender() {
+  const root = $('#lib-stats'); if (!root) return;
+  const D = stLoad(); stRoll();
+  const today = stDay(), days = []; for (let i = 6; i >= 0; i--) days.push(stAdd(today, -i));
+  const sel = days.includes(ST.sel) ? ST.sel : today;
+  ST.sel = sel;
+  const g = stGoal(), tr = D.days[today] || {}, got = Math.round(tr.p || 0), sk = stStreak();
+  const cap = sk.today ? 'Сегодня уже засчитано' : (got > 0 ? 'Прочитай ещё ' + Math.max(1, g.need - got) + ' стр. — и день засчитан' : 'Прочитай сегодня ' + g.need + ' стр. — и день засчитан');
+  const streak = `<section class="card st-streak" aria-label="Стрик"><span class="st-fl${sk.today ? ' on' : ''}">${ICON.flame}</span><div class="st-sk"><b>${sk.n}</b><span>${stPl(sk.n, ['день', 'дня', 'дней'])} подряд</span></div>${sk.best > 0 ? `<span class="st-best">Рекорд: ${sk.best}</span>` : '<span></span>'}<p class="st-cap">${cap}</p></section>`;
+  /* the last seven days: one button each, a bar for the pages, a tick when the day counted */
+  const mx = Math.max(ST_MIN, g.need, ...days.map(k => Math.round((D.days[k] || {}).p || 0)));
+  const wk = days.map(k => {
+    const r = D.days[k] || {}, p = Math.round(r.p || 0), h = p > 0 ? Math.max(10, Math.round(p / mx * 100)) : 0;
+    return `<button type="button" class="wk${r.hit ? ' hit' : ''}${k === today ? ' today' : ''}" data-day="${k}" aria-pressed="${k === sel}" aria-label="${esc(stDayName(k, today))}: ${p} стр.${r.hit ? ', день засчитан' : ''}"><span class="wk-bar"><i style="height:${h}%"></i></span><span class="wk-d">${stWd[stDate(k).getDay()]}</span><span class="wk-ck">${r.hit ? ICON.check : ''}</span></button>`;
+  }).join('');
+  const r = D.days[sel] || {};
+  const tiles = [[Math.round(r.p || 0), 'Страниц'], [r.w || 0, 'Новых слов'], [stAnki(sel), 'В Anki'], [stDur(r.s), 'Время']].map(([v, l]) => `<div class="card st-t"><b>${v}</b><span>${l}</span></div>`).join('');
+  root.innerHTML = streak + stPlanCard(D, g, got) + `<h2 class="sec-h st-sec">${esc(stDayName(sel, today))}</h2><div class="st-week" role="group" aria-label="Последние семь дней">${wk}</div><div class="st-tiles">${tiles}</div>`;
+}
+
+/* ----- the plan: a book and the number of days ----- */
+async function stBooks() {
+  let list = []; try { list = await idb.all('books'); } catch { /* none */ }
+  list.sort((a, b) => (b.openedAt || 0) - (a.openedAt || 0));
+  const out = [], seen = new Set();
+  for (const m of [...list, ...(BI.available ? BI.list() : [])]) { if (!seen.has(m.id)) { seen.add(m.id); out.push(m); } }
+  return out;
+}
+function stOpenMeta(m) { if (m.builtin) BI.open(m.id); else openStored(m.id); }
+function stOpenPlanBook() {
+  const P = stLoad().plan; if (!P) return;
+  const b = BI.available ? BI.meta(P.id) : null;
+  if (b) BI.open(P.id); else openStored(P.id);
+}
+async function stOpenPlan() {
+  const books = await stBooks(), D = stLoad(), P = D.plan && !D.plan.done ? D.plan : null;
+  const S = { id: P && books.some(b => b.id === P.id) ? P.id : '', days: P ? P.days : 30 };
+  const chips = [7, 14, 30, 60];
+  const rowHtml = m => {
+    const pct = Math.round((m.progress || 0) * 100);
+    return `<button type="button" class="st-bk" role="radio" aria-checked="${m.id === S.id}" data-bk="${esc(m.id)}">${coverHtml(m, 'st-cv')}<span class="st-bt"><b>${esc(m.title)}${m.pair ? ' · ' + langTag(m) : ''}</b><span>${pct ? 'прочитано ' + pct + '%' : 'не начата'}</span></span><i class="st-rd"></i></button>`;
+  };
+  const html = `<h2>План чтения <button class="icon-btn" data-close aria-label="Закрыть">${ICON.close}</button></h2>` +
+    (books.length ? `<h3>Книга</h3><div class="st-bks" role="radiogroup" aria-label="Книга">${books.map(rowHtml).join('')}</div>
+    <h3>За сколько дней прочесть</h3><div class="st-days">${chips.map(n => `<button type="button" class="chip" data-dd="${n}" aria-pressed="${n === S.days}">${n}</button>`).join('')}<input id="st-days" type="text" inputmode="numeric" maxlength="3" autocomplete="off" placeholder="Своё число" aria-label="Своё число дней" value="${chips.includes(S.days) ? '' : S.days}"></div>
+    <p class="st-prev" id="st-prev" role="status"></p><p class="st-note">Страницы считаются по размеру шрифта и экрана. В цель идут страницы любой книги.</p>
+    <button class="btn btn-primary" id="st-go" style="width:100%">${P ? 'Сохранить план' : 'Начать план'}</button>${P ? '<button class="btn btn-ghost" id="st-del" style="width:100%;margin-top:8px">Удалить план</button>' : ''}`
+    : '<p class="st-note" style="margin:14px 0">В библиотеке пока нет книг. Открой книгу — и вернись сюда.</p>');
+  openPanel(html, p => {
+    const prev = $('#st-prev', p), go = $('#st-go', p), inp = $('#st-days', p);
+    const upd = () => {
+      const m = books.find(b => b.id === S.id);
+      let txt = '', ok = false;
+      if (!m) txt = 'Выбери книгу';
+      else if (!(S.days >= 1)) txt = 'Укажи число дней от 1 до 365';
+      else if ((m.progress || 0) >= 0.985) txt = 'Эта книга уже прочитана';
+      else if (!D.n[m.id]) { txt = 'Страницы посчитаю, когда книга откроется'; ok = true; }
+      else { const left = Math.max(1, (1 - (m.progress || 0)) * D.n[m.id]); txt = '≈ ' + Math.ceil(left / S.days) + ' стр. в день · всего ' + Math.round(left) + ' стр.'; ok = true; }
+      if (prev) prev.textContent = txt;
+      if (go) go.disabled = !ok;
+    };
+    upd();
+    p.onclick = e => {
+      const b = e.target.closest('button'); if (!b) return;
+      if (b.hasAttribute('data-close')) return closePanel();
+      if (b.hasAttribute('data-bk')) { S.id = b.dataset.bk; for (const x of $$('.st-bk', p)) x.setAttribute('aria-checked', String(x === b)); upd(); return; }
+      if (b.hasAttribute('data-dd')) { S.days = +b.dataset.dd; for (const x of $$('[data-dd]', p)) x.setAttribute('aria-pressed', String(x === b)); inp.value = ''; upd(); return; }
+      if (b.id === 'st-del') {
+        if (!b.classList.contains('sure')) { b.classList.add('sure'); b.textContent = 'Точно удалить?'; return; }
+        D.plan = null; stSave(true); closePanel(); stRefresh(); toast('План удалён'); return;
+      }
+      if (b.id === 'st-go') stStartPlan(books, S);
+    };
+    if (inp) {
+      inp.addEventListener('input', () => {
+        const v = inp.value.replace(/\D/g, '').slice(0, 3); if (v !== inp.value) inp.value = v;
+        S.days = v ? Math.min(365, parseInt(v, 10)) : 0;
+        for (const x of $$('[data-dd]', p)) x.setAttribute('aria-pressed', String(!!v && +x.dataset.dd === S.days));
+        upd();
+      });
+      inp.addEventListener('keydown', e => { e.stopPropagation(); if (e.key === 'Enter') { e.preventDefault(); inp.blur(); } });
+    }
+  }, { noFocus: true });
+}
+function stStartPlan(books, S) {
+  const m = books.find(b => b.id === S.id); if (!m || !(S.days >= 1)) return;
+  const D = stLoad(), t = stDay(), q = Math.min(1, m.progress || 0);
+  D.plan = { id: m.id, ids: [m.id, m.pair].filter(Boolean), title: m.title, days: S.days, start: t, q0: q, q, N: D.n[m.id] || 0, snap: { d: t, q } };
+  stSave(true);
+  closePanel();
+  if (!D.plan.N) { toast('Открываю книгу, чтобы посчитать страницы…', 4000); setTimeout(() => stOpenMeta(m), 250); }
+  else { toast('План готов: ' + stGoal().need + ' стр. в день', 4500); stRefresh(); }
+}
+function stClick(e) {
+  const b = e.target.closest('[data-st],[data-day]'); if (!b) return;
+  if (b.dataset.day) { ST.sel = b.dataset.day; stRender(); const n = $('[data-day="' + ST.sel + '"]', $('#lib-stats')); if (n) { try { n.focus({ preventScroll: true }); } catch { /* ignore */ } } return; }
+  if (b.dataset.st === 'plan') stOpenPlan();
+  else if (b.dataset.st === 'open') stOpenPlanBook();
+}
+function stInit() {
+  for (const ev of ['pointerdown', 'touchstart', 'touchmove', 'keydown', 'wheel', 'mousedown']) window.addEventListener(ev, stAct, { passive: true, capture: true });
+  $('#lib-tabs').addEventListener('click', e => { const b = e.target.closest('[data-tab]'); if (b) stTab(b.dataset.tab); });
+  $('#lib-stats').addEventListener('click', stClick);
+  $('#goal').addEventListener('click', stHideGoal);
+  ST.tt = stNow();
+  setInterval(stTick, 5000);
+  addEventListener('pagehide', () => stSave(true));
+  document.addEventListener('visibilitychange', () => { if (document.hidden) stSave(true); });
+  stRoll(); stBadge();
+}
+if (window.__RD_TEST) window.__rdst = { load: stLoad, save: stSave, reset: stReset, progress: stProgress, tick: stTick, act: stAct, jump: stJump, word: stWord, goal: stGoal, streak: stStreak, render: stRender, tab: stTab, day: stDay, add: stAdd, refresh: stRefresh, state: ST, openPlan: stOpenPlan, hide: stHideGoal, celebrate: stCelebrate };
+
 /* ---------- the translation sheet ---------- */
 const sheetEl = $('#sheet'), sheetIn = $('#sheet-in');
 let sheetT = 0;
@@ -4452,7 +4845,8 @@ function runPart(st, part) {
   st[part] = { st: 'loading' };
   translate(spec, st.ctl.signal).then(v => {
     if (S !== st || st['t' + part] !== tok) return;
-    st[part] = { st: 'ok', v }; paint();
+    st[part] = { st: 'ok', v }; if (part === 'w') stWord(st.word, v && v.lemma);
+    paint();
   }, e => {
     if (S !== st || st['t' + part] !== tok || (e && e.code === 'cancelled')) return;
     st[part] = { st: 'err', e }; paint();
@@ -4865,7 +5259,7 @@ function init() {
   if (darkMQ.addEventListener) darkMQ.addEventListener('change', applyPrefs);
   $('#b-coll-lib').addEventListener('click', openColl);
   $('#b-coll-back').addEventListener('click', () => { if (!NAV.pop('coll')) show('lib'); });
-  renderLibrary(); bindTour(); maybeTour();
+  renderLibrary(); stInit(); bindTour(); maybeTour();
   if (IN_CLAUDE) {
     const c = window.claude;
     c.use('sample').then(s => { cap.sample = s || null; if (!s) toast('Перевод доступен только на странице, открытой через Claude', 5000); }).catch(() => {});
