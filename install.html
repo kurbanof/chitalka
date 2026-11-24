@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F0DDC5">
+<title>Читалка: проверка установки</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<style>
+:root { --bg: #F0DDC5; --ink: #5F4830; --muted: #715940; --card: #FBF3E4; --line: rgba(95, 72, 48, .18); --accent: #8A5522; --on: #FFF8EC; --ok: #2F7A45; --bad: #A8333F; color-scheme: light; }
+@media (prefers-color-scheme: dark) { :root { --bg: #282828; --ink: #C3CBD6; --muted: #98A2AF; --card: #333; --line: rgba(255, 255, 255, .14); --accent: #F2B544; --on: #282828; --ok: #7CCB93; --bad: #F2A3AB; color-scheme: dark; } }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.5 system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; padding: max(18px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(28px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left)); }
+main { max-width: 36rem; margin: 0 auto; display: grid; gap: 14px; }
+h1 { margin: 4px 0 0; font-size: 24px; line-height: 1.2; letter-spacing: -.01em; }
+h2 { margin: 0 0 8px; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+p { margin: 0; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 22px; padding: 16px; min-width: 0; }
+.verdict { font-weight: 700; font-size: 17px; }
+.verdict.ok { color: var(--ok); } .verdict.bad { color: var(--bad); }
+ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+ul li { display: flex; gap: 10px; align-items: baseline; padding: 7px 0; border-top: 1px solid var(--line); min-width: 0; }
+ul li:first-child { border-top: 0; }
+.mk { flex: none; width: 1.3em; text-align: center; font-weight: 800; }
+ul li.ok .mk { color: var(--ok); } ul li.bad .mk { color: var(--bad); } ul li.wait .mk { color: var(--muted); }
+ul li b { font-weight: 700; overflow-wrap: anywhere; }
+ul li small { display: block; color: var(--muted); font-size: 13.5px; line-height: 1.4; overflow-wrap: anywhere; }
+.btn { appearance: none; border: 0; border-radius: 999px; min-height: 48px; padding: 0 22px; font: 700 16px system-ui, sans-serif; background: var(--accent); color: var(--on); width: 100%; }
+.btn.soft { background: transparent; color: var(--ink); border: 1.5px solid var(--line); }
+.btn[hidden] { display: none; }
+.hint { font-size: 14.5px; color: var(--muted); }
+.hint b { color: var(--ink); }
+ol { margin: 8px 0 0; padding-left: 1.3em; font-size: 14.5px; color: var(--ink); display: grid; gap: 4px; }
+textarea { position: fixed; left: -9999px; top: 0; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Проверка установки</h1>
+  <p class="hint">Эта страница смотрит, всё ли на месте после загрузки на GitHub Pages, и подсказывает, что поправить.</p>
+  <section class="card"><div class="verdict" id="verdict" role="status">Проверяю…</div></section>
+  <section class="card"><h2>Адрес</h2><ul id="addr"></ul></section>
+  <section class="card"><h2>Файлы</h2><ul id="files"></ul></section>
+  <section class="card"><h2>Работа без интернета</h2><ul id="sw"></ul></section>
+  <section class="card" id="inst">
+    <h2>Установка</h2>
+    <ul id="instl"></ul>
+    <button class="btn" id="go" hidden style="margin-top:12px">Установить приложение</button>
+    <ol id="how" hidden></ol>
+  </section>
+  <button class="btn soft" id="copy">Скопировать отчёт</button>
+  <p class="hint"><a href="./" style="color:var(--accent);font-weight:700">Открыть читалку</a></p>
+</main>
+<textarea id="ta" aria-hidden="true" tabindex="-1"></textarea>
+<script>
+(function () {
+  var $ = function (s) { return document.querySelector(s); };
+  var report = [];
+  var bad = [];
+  function row(list, state, title, note) {
+    var li = document.createElement('li'); li.className = state;
+    li.innerHTML = '<span class="mk">' + (state === 'ok' ? '✓' : state === 'bad' ? '✕' : '…') + '</span><span><b></b><small></small></span>';
+    li.querySelector('b').textContent = title; li.querySelector('small').textContent = note || '';
+    if (!note) li.querySelector('small').remove();
+    $(list).appendChild(li);
+    report.push((state === 'ok' ? 'OK   ' : state === 'bad' ? 'FAIL ' : '...  ') + title + (note ? ' — ' + note : ''));
+    return li;
+  }
+  var kb = function (n) { return n > 1048576 ? (n / 1048576).toFixed(1) + ' МБ' : Math.max(1, Math.round(n / 1024)) + ' КБ'; };
+
+  /* 1. the address */
+  var h = location.hostname, p = location.pathname.replace(/[^/]*$/, '');
+  report.push('Адрес: ' + location.href);
+  report.push('Браузер: ' + navigator.userAgent);
+  if (location.protocol === 'https:' || h === 'localhost' || h === '127.0.0.1') row('#addr', 'ok', 'Защищённый адрес (https)', location.origin + p);
+  else { bad.push('адрес'); row('#addr', 'bad', 'Адрес без https', 'Установка работает только с https://. На GitHub Pages включи «Enforce HTTPS» (Settings → Pages).'); }
+  if (/github\.io$/.test(h)) row('#addr', 'ok', 'GitHub Pages', 'Сайт: ' + h + p);
+  var inApp = /(FBAN|FBAV|Instagram|Telegram|VKApp|; wv\)|YaSearchApp|MiuiBrowser\/.*Mobile Safari.*Line)/i.test(navigator.userAgent);
+  if (inApp) row('#addr', 'bad', 'Страница открыта внутри другого приложения', 'Открой ссылку в Chrome или Safari: во встроенных браузерах установки нет.');
+
+  /* 2. the files */
+  var FILES = [
+    ['index.html', 'Само приложение', function (r, b) { return b.size > 1000000 ? '' : 'файл слишком маленький (' + kb(b.size) + '): загрузился не полностью или не тот'; }],
+    ['manifest.json', 'Описание приложения', function (r, b) { return b.text().then(function (t) { try { var m = JSON.parse(t); return m.name && m.icons && m.icons.length ? '' : 'в файле нет названия или значков'; } catch (e) { return 'файл повреждён'; } }); }],
+    ['sw.js', 'Работа без интернета', function (r, b) { return b.text().then(function (t) { return /addEventListener\('fetch'/.test(t) ? '' : 'это не тот файл'; }); }],
+    ['icon-192.png', 'Значок 192', function (r) { return /^image\//.test(r.headers.get('content-type') || '') ? '' : 'это не картинка'; }],
+    ['icon-512.png', 'Значок 512', function (r) { return /^image\//.test(r.headers.get('content-type') || '') ? '' : 'это не картинка'; }],
+    ['maskable-512.png', 'Значок для Android', function (r) { return /^image\//.test(r.headers.get('content-type') || '') ? '' : 'это не картинка'; }],
+    ['apple-touch-icon.png', 'Значок для iPhone', function (r) { return /^image\//.test(r.headers.get('content-type') || '') ? '' : 'это не картинка'; }],
+    ['icon.svg', 'Значок (вектор)', function () { return ''; }]
+  ];
+  var tests = FILES.map(function (f) {
+    return fetch(f[0] + '?check=' + Date.now(), { cache: 'no-store' }).then(function (r) {
+      if (!r.ok) { bad.push(f[0]); row('#files', 'bad', f[0], 'не найден на сайте (ответ ' + r.status + ')'); return; }
+      return r.blob().then(function (b) {
+        return Promise.resolve(f[2](r, b)).then(function (why) {
+          if (why) { bad.push(f[0]); row('#files', 'bad', f[0], why); } else row('#files', 'ok', f[0], f[1] + ', ' + kb(b.size));
+        });
+      });
+    }).catch(function (e) { bad.push(f[0]); row('#files', 'bad', f[0], 'не загрузился: ' + (e && e.message || e)); });
+  });
+  /* leftovers of the old layout with a sub-folder */
+  tests.push(fetch('icons/icon-192.png?check=' + Date.now(), { cache: 'no-store' }).then(function (r) { if (r.ok) row('#files', 'ok', 'Папка icons', 'от старой версии: она не мешает, но не нужна'); }).catch(function () {}));
+
+  /* 3. the worker */
+  var swDone = (function () {
+    if (!('serviceWorker' in navigator)) { bad.push('браузер'); row('#sw', 'bad', 'Браузер не поддерживает установку', 'Нужен свежий Chrome (Android) или Safari (iPhone).'); return Promise.resolve(); }
+    return navigator.serviceWorker.register('sw.js').then(function (reg) {
+      return new Promise(function (res) {
+        var w = reg.installing || reg.waiting || reg.active, t = setTimeout(function () { res('время вышло'); }, 12000);
+        if (w && w.state === 'activated') { clearTimeout(t); return res(''); }
+        if (!w) { clearTimeout(t); return res(''); }
+        w.addEventListener('statechange', function () { if (w.state === 'activated') { clearTimeout(t); res(''); } else if (w.state === 'redundant') { clearTimeout(t); res('воркер не установился: скорее всего, не хватает файла из списка выше'); } });
+      });
+    }).then(function (why) {
+      if (why) { bad.push('sw'); row('#sw', 'bad', 'Воркер не запустился', why); } else row('#sw', 'ok', 'Воркер запущен', 'приложение сможет открываться без интернета');
+    }).catch(function (e) { bad.push('sw'); row('#sw', 'bad', 'Воркер не запустился', (e && e.message) || String(e)); });
+  })();
+
+  /* 4. the install */
+  var deferred = null, standalone = false;
+  try { standalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone === true; } catch (e) { /* ignore */ }
+  window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); deferred = e; });
+  window.addEventListener('appinstalled', function () { $('#go').hidden = true; row('#instl', 'ok', 'Приложение установлено'); });
+  var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+  Promise.all(tests.concat([swDone])).then(function () { return new Promise(function (r) { setTimeout(r, 1800); }); }).then(function () {
+    var v = $('#verdict'), problems = bad.filter(function (x) { return x !== 'браузер'; });
+    if (standalone) { row('#instl', 'ok', 'Читалка уже открыта как установленное приложение'); }
+    else if (deferred) { row('#instl', 'ok', 'Браузер готов установить приложение', 'нажми кнопку ниже'); $('#go').hidden = false; }
+    else if (!problems.length) row('#instl', 'wait', 'Браузер пока не предлагает кнопку установки', 'это нормально: установи через меню, как написано ниже');
+    else row('#instl', 'bad', 'Установка недоступна', 'сначала исправь то, что отмечено красным выше');
+    if (!standalone && !deferred) {
+      var how = $('#how'); how.hidden = false;
+      how.innerHTML = isIOS ? '<li>В Safari нажми «Поделиться» (квадрат со стрелкой)</li><li>Выбери «На экран “Домой”»</li><li>Нажми «Добавить»</li>'
+        : '<li>Нажми меню браузера (три точки ⋮)</li><li>Выбери «Установить приложение» или «Добавить на главный экран»</li><li>Если такого пункта нет, открой эту страницу в Chrome</li>';
+    }
+    if (problems.length) {
+      v.className = 'verdict bad';
+      var miss = problems.filter(function (x) { return /\.(html|json|js|png|svg)$/.test(x); });
+      v.textContent = miss.length ? 'Не хватает: ' + miss.join(', ') + '.' : 'Есть проблема, смотри красные пункты.';
+      var fix = document.createElement('p'); fix.className = 'hint'; fix.style.marginTop = '8px';
+      fix.innerHTML = miss.length ? 'Загрузи эти файлы в <b>корень</b> репозитория (Add file → Upload files, файлы лежат в zip), подожди 1–2 минуты и обнови эту страницу.' : 'Исправь это, подожди 1–2 минуты и обнови страницу.';
+      v.parentNode.appendChild(fix);
+    } else { v.className = 'verdict ok'; v.textContent = 'Всё на месте. Установка должна работать.'; }
+    report.unshift(v.textContent);
+  });
+
+  $('#go').addEventListener('click', function () {
+    if (!deferred) return;
+    var d = deferred; deferred = null; $('#go').hidden = true;
+    d.prompt().then(function () { return d.userChoice; }).catch(function () {});
+  });
+  $('#copy').addEventListener('click', function () {
+    var t = report.join('\n'), b = $('#copy');
+    var done = function () { b.textContent = 'Скопировано'; setTimeout(function () { b.textContent = 'Скопировать отчёт'; }, 2200); };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(done, fallback); else fallback();
+    function fallback() { var ta = $('#ta'); ta.value = t; ta.select(); try { document.execCommand('copy'); done(); } catch (e) { b.textContent = 'Не удалось скопировать'; } }
+  });
+})();
+</script>
+</body>
+</html>

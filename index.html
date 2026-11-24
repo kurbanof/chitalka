@@ -29,6 +29,7 @@
   --bar-bg: rgba(243, 226, 204, .86); --paper: rgba(243, 226, 204, .94); --chip: rgba(95, 72, 48, .1); --line: rgba(95, 72, 48, .16);
   --line-strong: rgba(95, 72, 48, .32); --line-on-glass: rgba(95, 72, 48, .18);
   --hl-s: rgba(138, 85, 34, .15); --hl-w: rgba(138, 85, 34, .36);
+  --mk: rgba(66, 44, 112, .32); --mk-ink: #55408F;
   --shade: rgba(70, 48, 24, .24); --warn: #A8333F; --scrim: rgba(40, 28, 14, .36);
   --fs: 19px; --lh: 1.6; --fw: 400; --align: justify; --hyph: auto; --indent: 1.3em; --pm: .2em;
   --mx: 22px; --myt: 22px; --myb: 22px; --pg-h: 80vh; --sheet-h: 0px;
@@ -46,7 +47,7 @@
     --c1: #B98F45; --c2: #DDAA45; --c3: #F2C56B; --on-c: #282828;
     --bar-bg: rgba(50, 50, 50, .88); --paper: rgba(50, 50, 50, .95); --chip: rgba(255, 255, 255, .08); --line: rgba(255, 255, 255, .13);
     --line-strong: rgba(255, 255, 255, .3); --line-on-glass: rgba(255, 255, 255, .2);
-    --hl-s: rgba(242, 181, 68, .16); --hl-w: rgba(242, 181, 68, .38);
+    --hl-s: rgba(242, 181, 68, .16); --hl-w: rgba(242, 181, 68, .38); --mk: rgba(190, 208, 255, .34); --mk-ink: #B9C8FF;
     --shade: rgba(0, 0, 0, .55); --warn: #F2A3AB; --scrim: rgba(0, 0, 0, .5);
     color-scheme: dark;
   }
@@ -63,7 +64,7 @@
   --c1: #B98F45; --c2: #DDAA45; --c3: #F2C56B; --on-c: #282828;
   --bar-bg: rgba(50, 50, 50, .88); --paper: rgba(50, 50, 50, .95); --chip: rgba(255, 255, 255, .08); --line: rgba(255, 255, 255, .13);
   --line-strong: rgba(255, 255, 255, .3); --line-on-glass: rgba(255, 255, 255, .2);
-  --hl-s: rgba(242, 181, 68, .16); --hl-w: rgba(242, 181, 68, .38);
+  --hl-s: rgba(242, 181, 68, .16); --hl-w: rgba(242, 181, 68, .38); --mk: rgba(190, 208, 255, .34); --mk-ink: #B9C8FF;
   --shade: rgba(0, 0, 0, .55); --warn: #F2A3AB; --scrim: rgba(0, 0, 0, .5);
   color-scheme: dark;
 }
@@ -78,6 +79,10 @@ body {
   padding-block: 0; min-height: 100%; overflow-x: hidden;
 }
 body.in-reader { overflow: hidden; padding: 0; }
+/* no grey-blue flash on a tap, on links or anywhere else (keyboard focus keeps its ring) */
+*, *::before, *::after { -webkit-tap-highlight-color: transparent; }
+a, a:hover, a:active, a:focus { -webkit-tap-highlight-color: transparent; }
+a:focus:not(:focus-visible), button:focus:not(:focus-visible) { outline: none; }
 button, input, select { font: inherit; color: inherit; }
 button { cursor: pointer; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
@@ -351,8 +356,6 @@ body.in-reader:not(.sheet-open) .toast { bottom: calc(96px + env(safe-area-inset
 .chip { min-height: 36px; padding: 0 14px; border: 0; border-radius: 999px; background: var(--chip); color: var(--ink); font: 700 13px var(--font-ui); }
 .chip[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); }
 .help.warn { color: var(--warn); }
-#lib-eng .help { display: flex; gap: 10px; align-items: center; justify-content: space-between; margin: 12px 0 0; }
-#lib-eng .btn { min-height: 38px; padding: 0 14px; flex: none; }
 .pill-pair { background: var(--hl-s); color: var(--accent-ink); }
 .sh-src { font: 700 12px/1.3 var(--font-ui); color: var(--muted); margin-top: 10px; }
 .sh-tr.sh-book { color: var(--accent-ink); }
@@ -360,9 +363,59 @@ body.in-reader:not(.sheet-open) .toast { bottom: calc(96px + env(safe-area-inset
 .sh-tr.sh-dict.ar { font-size: 24px; }
 .sh-sent b { color: var(--accent-ink); }
 .sh-mt { min-height: 40px; margin-top: 10px; }
+/* the word sheet: the word and its tools on one row, the translation, then what the other book says */
+.sh-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 4px; min-height: 44px; }
+.sh-head .sh-word { flex: 1 1 5ch; min-width: 0; padding-top: 2px; font-size: 27px; }
+.sh-head-s { justify-content: flex-end; }
+.sh-tools { display: flex; flex: none; align-items: center; margin-inline-end: -8px; }
+.sh-tools .icon-btn { width: 42px; height: 42px; }
+.sh-ic[aria-pressed="true"] { background: var(--chip); color: var(--accent-ink); }
+.sh-ic[data-act="mark"][aria-pressed="true"] { color: var(--mk-ink); }
+.sh-ic[aria-pressed="true"] svg { fill: currentColor; }
+.sh-ic:disabled { opacity: .35; }
+.sh-saved { display: flex; align-items: center; gap: 6px; margin-top: 2px; font: 700 12.5px/1.2 var(--font-ui); color: var(--accent-ink); }
+.sh-saved svg.i { width: 16px; height: 16px; stroke-width: 2.4; }
+.sh-f { margin-top: 10px; }
+.sh-f .sh-tr { margin-top: 0; }
+.sh-f2 { padding-top: 10px; border-top: 1px solid var(--line); }
+.sh-f2 .sh-tr { font-size: 22px; }
+.sh-f2 .sh-tr.ar { font-size: 28px; }
+.sh-ps { font: 400 15px/1.5 var(--font-read); color: var(--ink-2); margin-top: 6px; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
+.sh-ps.ar { font-family: var(--font-ar); font-size: 18px; line-height: 1.8; }
+.sh-ps b { color: var(--accent-ink); }
+.sh-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.sh-pick { font: 500 17px/1.5 var(--font-read); margin: 6px 0 0; max-height: 9em; overflow: auto; overflow-wrap: anywhere; }
+.sh-pick.ar { font-family: var(--font-ar); font-size: 22px; line-height: 1.8; }
+/* the words of the book's collection are underlined in the text, the bookmarks are coloured: darker on the light page, lighter on the dark one */
+::highlight(rd-coll) { text-decoration: underline; text-decoration-color: var(--accent); text-decoration-thickness: 2px; }
+::highlight(rd-mark) { background-color: var(--mk); }
+/* collection: the notes row and the book chips */
+.c-notes { all: unset; box-sizing: border-box; display: flex; align-items: center; gap: 12px; width: 100%; padding: 12px 16px; margin: 14px 0 0; cursor: pointer; border-radius: 22px; background: var(--sheen), var(--glass); border: 1px solid var(--glass-border); box-shadow: var(--shadow), inset 0 1px 0 var(--hl); }
+.c-notes:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.c-notes-i { width: 40px; height: 40px; border-radius: 14px; display: grid; place-items: center; background: var(--chip); color: var(--mk-ink); flex: none; }
+.c-notes-t { flex: 1; min-width: 0; display: grid; }
+.c-notes-t b { font: 800 16px/1.3 var(--font-ui); }
+.c-notes-t small { font: 600 12.5px/1.3 var(--font-ui); color: var(--muted); }
+.c-notes-t small:empty { display: none; }
+.c-notes-go { font: 400 26px/1 var(--font-ui); color: var(--muted); }
+#c-books, #n-books { flex-wrap: nowrap; overflow-x: auto; margin: 12px 0 0; padding-bottom: 4px; scrollbar-width: none; }
+#c-books::-webkit-scrollbar, #n-books::-webkit-scrollbar { display: none; }
+#c-books .chip, #n-books .chip { flex: none; white-space: nowrap; }
+.chip small { font: 800 11px var(--font-ui); opacity: .7; margin-left: 2px; }
+.card-n { font: 500 16.5px/1.5 var(--font-read); overflow-wrap: anywhere; }
+.card-n.ar { font-family: var(--font-ar); font-size: 21px; line-height: 1.8; }
+.card-b { display: flex; gap: 2px; }
+/* .note is also the small grey hint line, so the card re-states what that rule would take away */
+.card.note { border-inline-start: 4px solid var(--mk-ink); padding: 16px; color: var(--ink); font-size: 16px; }
+.card.note .card-m { flex-wrap: wrap; }
+.card.note .card-m > span:first-child { flex: 1 1 100%; min-width: 0; overflow-wrap: anywhere; }
+.card.note .card-b { flex: none; margin-inline-start: auto; }
+.card.note .del { white-space: nowrap; }
+@media (max-width: 360px) { .sh-head .sh-word { font-size: 23px; } .sh-tools .icon-btn { width: 38px; height: 38px; } }
+
 
 /* ---------- screens: the library is the base, the reader and the collection slide over it ---------- */
-#v-coll { position: fixed; inset: 0; z-index: 12; background: var(--bg); overflow-y: auto; overscroll-behavior: contain;
+#v-coll, #v-stats, #v-notes { position: fixed; inset: 0; z-index: 12; background: var(--bg); overflow-y: auto; overscroll-behavior: contain;
   padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-bottom: 48px; }
 #v-lib.under { visibility: hidden; }
 body.covered { overflow: hidden; }
@@ -393,7 +446,7 @@ body.covered { overflow: hidden; }
 .book-card { transition: transform .2s cubic-bezier(.2, .8, .2, 1), box-shadow .2s; }
 .book-card:active { transform: scale(.982); }
 @keyframes rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
-body.boot .lib-hero, body.boot .sec-h, body.boot .book-card, body.boot .empty, body.boot #lib-eng > * { animation: rise .55s cubic-bezier(.2, .8, .2, 1) both; animation-delay: calc(var(--i, 0) * 55ms); }
+body.boot .lib-hero, body.boot .sec-h, body.boot .book-card, body.boot .empty { animation: rise .55s cubic-bezier(.2, .8, .2, 1) both; animation-delay: calc(var(--i, 0) * 55ms); }
 ::view-transition-old(root), ::view-transition-new(root) { animation-duration: .34s; }
 @media (prefers-reduced-motion: reduce) {
   .v-enter, .v-leave, .sheet, .sheet.out, .scrim, .scrim.out, .scrim .panel, .scrim.out .panel, .toast, .toast.out, body.boot * { animation: none !important; }
@@ -587,15 +640,15 @@ body.boot .lib-hero, body.boot .sec-h, body.boot .book-card, body.boot .empty, b
 .pb-go:focus-within input { background: color-mix(in srgb, var(--accent) 30%, transparent); }
 
 /* ---------- statistics tab ---------- */
-.tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; margin-top: 14px; padding: 3px; border-radius: 999px; background: var(--chip); }
-.tabs button { min-height: 42px; border: 0; border-radius: 999px; background: transparent; color: var(--ink-3); font: 800 14px var(--font-ui); display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: background-color .22s, color .22s, box-shadow .22s; }
-.tabs button[aria-selected="true"] { background: var(--glass-strong); color: var(--ink); box-shadow: 0 1px 4px var(--shade), inset 0 1px 0 var(--hl); }
-.tab-n { display: inline-flex; align-items: center; gap: 2px; font: 800 12.5px var(--font-ui); color: var(--accent-ink); }
-.tab-n:empty { display: none; }
-.tab-n svg { width: 15px; height: 15px; fill: currentColor; stroke: none; }
-#lib-stats { display: grid; gap: 12px; margin-top: 14px; padding-bottom: 28px; }
-#lib-stats[hidden] { display: none; }
-#lib-stats .sec-h { margin: 14px 4px -2px; }
+#b-stat-lib { position: relative; }
+#b-stat-lib svg { width: 24px; height: 24px; fill: currentColor; stroke: none; }
+#b-stat-lib.on { color: var(--accent); }
+#b-stat-lib.off { color: var(--ink-3); }
+.st-n { position: absolute; right: 1px; bottom: 3px; min-width: 17px; height: 17px; padding: 0 4px; box-sizing: border-box; border-radius: 99px; display: grid; place-items: center; background: var(--accent); color: var(--on-accent); font: 800 11px/1 var(--font-ui); box-shadow: 0 0 0 2px var(--glass-strong, var(--bg)); }
+.st-n:empty { display: none; }
+@media (max-width: 360px) { .top .icon-btn { width: 40px; } .top h1 { font-size: 18px; padding-left: 4px; } }
+#st-root { display: grid; gap: 12px; margin-top: 14px; padding-bottom: 28px; }
+#st-root .sec-h { margin: 14px 4px -2px; }
 .st-streak { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 2px 14px; }
 .st-fl { grid-row: span 2; width: 58px; height: 58px; border-radius: 50%; display: grid; place-items: center; background: var(--chip); color: var(--ink-3); }
 .st-fl svg { width: 30px; height: 30px; fill: currentColor; stroke: none; }
@@ -630,11 +683,11 @@ body.boot .lib-hero, body.boot .sec-h, body.boot .book-card, body.boot .empty, b
 .wk.hit .wk-bar i { background: var(--accent); }
 .wk-ck { height: 14px; color: var(--accent-ink); }
 .wk-ck svg { width: 14px; height: 14px; stroke-width: 3.2; }
-.st-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.st-t { padding: 14px 16px; border-radius: 22px; }
-.st-t b { display: block; font: 800 30px/1.1 var(--font-ui); letter-spacing: -.02em; overflow-wrap: anywhere; }
-.st-t b small { margin-left: 4px; font: 700 14px var(--font-ui); letter-spacing: 0; color: var(--muted); }
-.st-t span { display: block; margin-top: 4px; font: 700 12.5px var(--font-ui); color: var(--muted); }
+.st-tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.st-t { padding: 12px 10px 12px 14px; border-radius: 22px; min-width: 0; }
+.st-t b { display: block; font: 800 26px/1.1 var(--font-ui); letter-spacing: -.02em; overflow-wrap: anywhere; }
+.st-t b small { margin-left: 2px; font: 700 12px var(--font-ui); letter-spacing: 0; color: var(--muted); }
+.st-t span { display: block; margin-top: 4px; font: 700 12px/1.25 var(--font-ui); color: var(--muted); }
 .st-bks { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; max-height: 34vh; overflow-y: auto; overscroll-behavior: contain; margin: 6px -4px 0; padding: 4px; }
 .st-bk { display: flex; align-items: center; gap: 12px; width: 100%; min-width: 0; box-sizing: border-box; min-height: 64px; padding: 8px 14px 8px 8px; border: 1.5px solid transparent; border-radius: 18px; background: var(--chip); color: var(--ink); text-align: left; font: inherit; }
 .st-bk[aria-checked="true"] { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, transparent); }
@@ -669,10 +722,10 @@ body.boot .lib-hero, body.boot .sec-h, body.boot .book-card, body.boot .empty, b
 .goal-in { animation: goal-in .5s cubic-bezier(.2, .9, .25, 1.1) both; }
 .goal-ic { animation: goal-badge .6s .12s cubic-bezier(.2, 1.3, .4, 1) both; }
 .goal.out .goal-in { animation: goal-out .25s ease-in both; }
-@media (prefers-reduced-motion: reduce) { .goal-in, .goal-ic, .goal-c i, .st-bar i, .tabs button { animation: none !important; transition: none !important; } .goal-c { display: none; } }
+@media (prefers-reduced-motion: reduce) { .goal-in, .goal-ic, .goal-c i, .st-bar i { animation: none !important; transition: none !important; } .goal-c { display: none; } }
 </style>
 <div class="bg" aria-hidden="true"></div>
-<link rel="manifest" href="manifest.webmanifest">
+<link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -687,23 +740,19 @@ body.boot .lib-hero, body.boot .sec-h, body.boot .book-card, body.boot .empty, b
     <header class="top">
       <h1>Читалка</h1>
       <button class="icon-btn" id="b-theme" aria-label="Сменить тему: день или ночь"></button>
+      <button class="icon-btn" id="b-stat-lib" aria-label="Статистика и стрик"></button>
       <button class="icon-btn" id="b-coll-lib" aria-label="Коллекция слов"></button>
       <button class="icon-btn" id="b-set-lib" aria-label="Настройки и движок перевода"></button>
     </header>
     <div class="wrap">
-      <div class="tabs" id="lib-tabs" role="tablist" aria-label="Раздел"><button type="button" role="tab" data-tab="books" aria-selected="true">Книги</button><button type="button" role="tab" data-tab="stats" aria-selected="false">Статистика<span class="tab-n" id="tab-n"></span></button></div>
-      <div id="lib-main">
       <div class="lib-actions">
         <label class="btn btn-primary" for="file" id="open-lbl"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Открыть книгу</label>
         <label class="btn btn-soft" for="file-pair" id="open-pair-lbl"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h6a2 2 0 0 1 2 2v12a2 2 0 0 0-2-2H4zM20 5h-6a2 2 0 0 0-2 2v12a2 2 0 0 1 2-2h6z"/></svg>Две книги</label>
       </div>
-      <div id="lib-eng"></div>
       <div id="lib-builtin"></div>
       <div id="lib-books"></div>
       <h2 class="sec-h">Примеры</h2>
       <div class="books" id="lib-samples"></div>
-      </div>
-      <div id="lib-stats" role="tabpanel" aria-label="Статистика" hidden></div>
     </div>
   </section>
 
@@ -736,6 +785,8 @@ body.boot .lib-hero, body.boot .sec-h, body.boot .book-card, body.boot .empty, b
       <button class="icon-btn" id="b-theme2" aria-label="Сменить тему: день или ночь"></button>
     </header>
     <div class="wrap">
+      <button type="button" class="card c-notes" id="c-notes"><span class="c-notes-i" id="c-notes-i"></span><span class="c-notes-t"><b>Заметки</b><small id="c-notes-n"></small></span><span class="c-notes-go" aria-hidden="true">›</span></button>
+      <div class="chips" id="c-books" role="group" aria-label="Коллекция книги"></div>
       <div class="coll-bar">
         <input type="search" id="c-q" placeholder="Поиск по словам" aria-label="Поиск по коллекции">
         <button class="btn btn-primary" id="c-export">Экспорт в Anki</button>
@@ -743,6 +794,31 @@ body.boot .lib-hero, body.boot .sec-h, body.boot .book-card, body.boot .empty, b
       </div>
       <div class="cards" id="c-list"></div>
     </div>
+  </section>
+
+  <section id="v-notes" hidden>
+    <header class="top">
+      <button class="icon-btn" id="b-notes-back" aria-label="Назад"></button>
+      <h1>Заметки <span class="muted" id="n-count"></span></h1>
+      <button class="icon-btn" id="b-theme4" aria-label="Сменить тему: день или ночь"></button>
+    </header>
+    <div class="wrap">
+      <div class="chips" id="n-books" role="group" aria-label="Заметки книги"></div>
+      <div class="coll-bar">
+        <input type="search" id="n-q" placeholder="Поиск по заметкам" aria-label="Поиск по заметкам">
+        <button class="btn btn-soft" id="n-copy">Копировать</button>
+      </div>
+      <div class="cards" id="n-list"></div>
+    </div>
+  </section>
+
+  <section id="v-stats" hidden>
+    <header class="top">
+      <button class="icon-btn" id="b-stat-back" aria-label="Назад"></button>
+      <h1>Статистика</h1>
+      <button class="icon-btn" id="b-theme3" aria-label="Сменить тему: день или ночь"></button>
+    </header>
+    <div class="wrap"><div id="st-root"></div></div>
   </section>
 </div>
 
@@ -777,7 +853,8 @@ const ICON = {
   gear: '<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg>',
   back: '<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>',
   toc: '<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 6.5H20M9.5 12H20M9.5 17.5H20"/><circle cx="4.8" cy="6.5" r=".9" fill="currentColor"/><circle cx="4.8" cy="12" r=".9" fill="currentColor"/><circle cx="4.8" cy="17.5" r=".9" fill="currentColor"/></svg>',
-  coll: '<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10a1 1 0 011 1v15l-6-4-6 4V5a1 1 0 011-1z"/></svg>',
+  coll: '<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.6l2.6 5.4 5.9.8-4.3 4.1 1.1 5.9L12 17l-5.3 2.8 1.1-5.9L3.5 9.8l5.9-.8z"/></svg>',
+  mark: '<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10a1 1 0 011 1v15l-6-4-6 4V5a1 1 0 011-1z"/></svg>',
   moon: '<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 019.5 4 8 8 0 1020 14.5z"/></svg>',
   sun: '<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg>',
   close: '<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>',
@@ -839,7 +916,7 @@ function applyPrefs() {
   set('--indent', P.indent ? '1.3em' : '0');
   set('--pm', P.indent ? '.2em' : '.85em');
   set('--mx', (P.margins ? 22 : 8) + 'px');
-  for (const b of $$('#b-theme, #b-theme2')) b.innerHTML = isDark() ? ICON.sun : ICON.moon;
+  for (const b of $$('#b-theme, #b-theme2, #b-theme3, #b-theme4')) b.innerHTML = isDark() ? ICON.sun : ICON.moon;
   const tc = document.querySelector('meta[name="theme-color"]');            /* the phone's status bar follows the theme */
   if (tc) tc.setAttribute('content', isDark() ? '#282828' : '#F0DDC5');
 }
@@ -955,47 +1032,53 @@ const textOf = n => (n ? n.textContent : '').replace(/\s+/g, ' ').trim();
 
 /* ---------- word collection: shared `db` when this view has it, localStorage always as a mirror ---------- */
 const cap = { sample: null, db: null, downloads: null };
-const Coll = {
-  map: new Map(),
-  subs: new Set(),
-  remote: false,
-  init() {
-    const local = ls.get('rd.words', {});
-    for (const [k, v] of Object.entries(local)) this.map.set(k, v);
-  },
-  mirror() { const o = {}; for (const [k, v] of this.map) o[k] = v; ls.set('rd.words', o); },
-  notify() { for (const f of this.subs) { try { f(); } catch { /* ignore */ } } },
-  all() { return [...this.map.values()].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)); },
-  has(id) { return this.map.has(id); },
-  attach(db) {
-    cap.db = db; this.remote = true;
-    const col = db.collection('words');
-    col.onSnapshot(snap => {
-      const next = new Map();
-      for (const d of snap.docs) { const v = d.data(); if (v) next.set(d.id, v); }
-      // entries saved while the shared store was not reachable go up now
-      for (const [k, v] of this.map) if (v.pending && !next.has(k)) { next.set(k, { ...v, pending: undefined }); col.doc(k).set(clean({ ...v, pending: undefined })).catch(() => {}); }
-      this.map = next; this.mirror(); this.notify();
-    }, () => { this.remote = false; });
-  },
-  async save(entry) {
-    const e = clean(entry);
-    this.map.set(e.id, (this.remote || !IN_CLAUDE) ? e : { ...e, pending: 1 });
-    this.mirror(); this.notify();
-    if (this.remote) {
-      try { await cap.db.collection('words').doc(e.id).set(e); }
-      catch (err) { this.map.delete(e.id); this.mirror(); this.notify(); throw err; }
+/* a keyed store of small records (the word collection, the notes): shared `db` when this view has it, localStorage always as a mirror */
+function makeStore(lsKey, dbName) {
+  return {
+    map: new Map(),
+    subs: new Set(),
+    remote: false,
+    init() {
+      const local = ls.get(lsKey, {});
+      for (const [k, v] of Object.entries(local)) this.map.set(k, v);
+    },
+    mirror() { const o = {}; for (const [k, v] of this.map) o[k] = v; ls.set(lsKey, o); },
+    notify() { for (const f of this.subs) { try { f(); } catch { /* ignore */ } } },
+    all() { return [...this.map.values()].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)); },
+    has(id) { return this.map.has(id); },
+    get(id) { return this.map.get(id); },
+    attach(db) {
+      cap.db = db; this.remote = true;
+      const col = db.collection(dbName);
+      col.onSnapshot(snap => {
+        const next = new Map();
+        for (const d of snap.docs) { const v = d.data(); if (v) next.set(d.id, v); }
+        // entries saved while the shared store was not reachable go up now
+        for (const [k, v] of this.map) if (v.pending && !next.has(k)) { next.set(k, { ...v, pending: undefined }); col.doc(k).set(clean({ ...v, pending: undefined })).catch(() => {}); }
+        this.map = next; this.mirror(); this.notify();
+      }, () => { this.remote = false; });
+    },
+    async save(entry) {
+      const e = clean(entry);
+      this.map.set(e.id, (this.remote || !IN_CLAUDE) ? e : { ...e, pending: 1 });
+      this.mirror(); this.notify();
+      if (this.remote) {
+        try { await cap.db.collection(dbName).doc(e.id).set(e); }
+        catch (err) { this.map.delete(e.id); this.mirror(); this.notify(); throw err; }
+      }
+    },
+    async remove(id) {
+      const old = this.map.get(id);
+      this.map.delete(id); this.mirror(); this.notify();
+      if (this.remote) {
+        try { await cap.db.collection(dbName).doc(id).delete(); }
+        catch (err) { if (old) this.map.set(id, old); this.mirror(); this.notify(); throw err; }
+      }
     }
-  },
-  async remove(id) {
-    const old = this.map.get(id);
-    this.map.delete(id); this.mirror(); this.notify();
-    if (this.remote) {
-      try { await cap.db.collection('words').doc(id).delete(); }
-      catch (err) { if (old) this.map.set(id, old); this.mirror(); this.notify(); throw err; }
-    }
-  }
-};
+  };
+}
+const Coll = makeStore('rd.words', 'words');     // the words saved with the star: one collection per book
+const Notes = makeStore('rd.notes', 'notes');    // the bookmarks: words and sentences marked in the text
 function clean(o) { return JSON.parse(JSON.stringify(o)); }
 
 /* ---------- small UI helpers ---------- */
@@ -1529,13 +1612,13 @@ async function loadPdf(buf, fallbackTitle) {
 }
 
 /* ---------- views ---------- */
-const views = { lib: $('#v-lib'), reader: $('#v-reader'), coll: $('#v-coll') };
+const views = { lib: $('#v-lib'), reader: $('#v-reader'), coll: $('#v-coll'), stats: $('#v-stats'), notes: $('#v-notes') };
 const bookEl = $('#book'), pdfEl = $('#pdf'), scroller = $('#scroller'), pager = $('#pager'), vReader = views.reader;
 /* The library is the base layer. The reader and the collection are screens that slide over it; it stays underneath (so its scroll place survives). */
 let curView = 'lib', swapT = 0;
 function finishSwap() {
   clearTimeout(swapT); swapT = 0;
-  for (const k of ['reader', 'coll']) {
+  for (const k of ['reader', 'coll', 'stats', 'notes']) {
     const el = views[k]; el.classList.remove('v-enter', 'v-leave');
     if (k !== curView) { el.hidden = true; if (k === 'reader' && !R.book) wipeReader(); }
   }
@@ -1620,8 +1703,7 @@ async function renderLibrary() {
   $('#lib-samples').innerHTML = SAMPLES.map(s => bookCard(s, true)).join('');
   const bb = $('#lib-builtin');
   if (bb) bb.innerHTML = BI.available ? '<h2 class="sec-h">Встроенные книги</h2><div class="books">' + cardsFor(BI.list(), true).join('') + '</div>' : '';
-  const be = $('#lib-eng'); if (be) be.innerHTML = engineBanner();
-  const parts = $$('#v-lib .sec-h, #v-lib .book-card, #v-lib #lib-eng > *');
+  const parts = $$('#v-lib .sec-h, #v-lib .book-card');
   parts.forEach((el, i) => el.style.setProperty('--i', Math.min(i, 9)));
   backfillCovers();
   if (!bootT && !noMotion()) { document.body.classList.add('boot'); bootT = setTimeout(() => document.body.classList.remove('boot'), 1400); }
@@ -1726,10 +1808,10 @@ function viewTop() { return scroller.getBoundingClientRect().top + (R.padT || 0)
 
 async function openBook(book, meta) {
   closeBook();
-  R.book = book; R.meta = meta; R.ch = 0; R.px = null; R.par = false; R.hold = null; R.dy = 0; R.spread = 0; R.laidH = false;
+  R.book = book; R.meta = meta; R.ch = 0; R.px = null; R.pq = null; R.lastA = null; R.par = false; R.hold = null; R.dy = 0; R.spread = 0; R.laidH = false;
   R.kind = book.format === 'pdf' ? 'pdf' : 'text';
   show('reader'); NAV.push('reader', leaveReader);
-  $('#r-title').textContent = book.title; $('#r-sub').textContent = '';
+  $('#r-title').textContent = book.title; $('#r-sub').textContent = ''; $('#r-sub').__t = '';
   vReader.classList.toggle('pdfmode', R.kind === 'pdf'); vReader.classList.remove('paged');
   bookEl.hidden = R.kind === 'pdf'; pdfEl.hidden = R.kind !== 'pdf';
   const bp = $('#b-par'); bp.hidden = !(R.kind === 'text' && meta.pair && !meta.sample); bp.setAttribute('aria-pressed', 'false');
@@ -1753,11 +1835,12 @@ function closeBook(keepDom) {
     R.token++;
     try { R.book.dispose(); } catch { /* ignore */ }
     R.book = null; R.blocks = []; R.chStart = []; R.hold = null;
+    clearMarks();
   }
   if (!keepDom) wipeReader();
 }
 function wipeReader() {
-  bookEl.replaceChildren(); pdfEl.replaceChildren(); clearHighlights();
+  bookEl.replaceChildren(); pdfEl.replaceChildren(); clearHighlights(); clearMarks();
   for (const k of ['width', 'height', 'columnCount', 'columnGap', 'transform']) bookEl.style[k] = '';
   pager.style.width = ''; pager.style.height = '';
   setLoad(false);
@@ -1781,6 +1864,7 @@ async function mountText(pos) {
   if (a) { restoreAnchor(a); R.hold = a; }
   bookEl.style.visibility = ''; setLoad(false);
   noteAnchor(); updateProgress();
+  setTimeout(() => { if (R.token === tk) refreshAllMarks(); }, 60);
   /* pictures and fonts arrive after the first layout: keep the same place on the page until the reader moves on */
   setTimeout(() => { if (R.token === tk) R.hold = null; }, 4500);
 }
@@ -1816,7 +1900,7 @@ function applyGeometry() {
   vReader.classList.toggle('paged', h); R.laidH = h;
   const cs = getComputedStyle(scroller);
   const padT = parseFloat(cs.paddingTop) || 0, padB = parseFloat(cs.paddingBottom) || 0, padL = parseFloat(cs.paddingLeft) || 0, padR = parseFloat(cs.paddingRight) || 0;
-  R.padT = padT;
+  R.padT = padT; R.lw = scroller.clientWidth; R.lh = scroller.clientHeight;
   const W = Math.max(120, scroller.clientWidth - padL - padR), H = Math.max(160, scroller.clientHeight - padT - padB);
   document.documentElement.style.setProperty('--pg-h', H + 'px');
   if (R.kind !== 'text') return;
@@ -1845,6 +1929,7 @@ function applyGeometry() {
 /* The page is shown by scrolling the clipping box over the columns. (Moving the whole book with a transform
    made every page turn cost time in proportion to the size of the book.) A turn glides unless motion is reduced. */
 function placePage(smooth, dx = 0) {
+  R.lastTurn = performance.now();
   const beh = smooth && !reduceMotion.matches ? 'smooth' : 'instant';
   pager.scrollTo({ left: Math.max(0, R.spread * R.step - dx), top: 0, behavior: dx ? 'instant' : beh });
   const y = R.dy ? -R.dy : 0;
@@ -1901,9 +1986,8 @@ function restoreAnchor(a) {
     placePage(false);
     R.lastA = a;
   } else {
-    const r = blk.el.getBoundingClientRect();
-    quiet(500);
-    scroller.scrollTop += r.top + a.f * r.height - (viewTop() + 1);
+    const r = blk.el.getBoundingClientRect(), d = r.top + a.f * r.height - (viewTop() + 1);
+    if (Math.abs(d) > 2) { quiet(500); scroller.scrollTop += d; }   /* writing the position stops a fling, so only when it really moved */
     R.lastA = a;
   }
 }
@@ -1926,10 +2010,12 @@ function gFromPos(pos) {
   return { b: i, f: 0 };
 }
 /* where the reader is, remembered at every step, so a change that reflows the text (font, screen size, late pictures) can put it back */
-function noteAnchor() { if (R.book && R.kind === 'text' && R.blocks.length) R.lastA = anchorNow(); }
+function noteAnchor() { if (R.book && R.kind === 'text' && R.blocks.length) R.lastA = anchorNow(); return R.lastA; }
 function holdHere() { if (R.book && R.kind === 'text' && !views.reader.hidden && R.blocks.length && !R.pendA) R.pendA = R.hold || R.lastA || anchorNow(); }
-function relayoutKeep() {
+function relayoutKeep(now = true) {
   if (!R.book || views.reader.hidden) return;
+  /* a nudge from outside (late fonts or pictures, the screen changing size) never lands in the middle of a fling or a page turn */
+  if (!now && performance.now() - Math.max(R.lastScroll || 0, R.lastTurn || 0) < 240) { relayoutSoon(); return; }
   if (R.kind === 'pdf') { applyGeometry(); return; }
   const a = R.pendA || R.hold || R.lastA || anchorNow();
   R.pendA = null;
@@ -1937,7 +2023,7 @@ function relayoutKeep() {
   restoreAnchor(a);
   updateProgress();
 }
-const relayoutSoon = debounce(relayoutKeep, 140);
+const relayoutSoon = debounce(() => relayoutKeep(false), 140);
 
 /* position, progress, saving */
 function curPos() {
@@ -1967,27 +2053,26 @@ function pageState() {
   return { N, cur, q: span > 0 ? clamp(st / span, 0, 1) : 0 };
 }
 const fmtPct = v => (v < 10 && v > 0 ? v.toFixed(1) : String(Math.round(v))).replace('.', ',') + '%';
-function updateProgress() {
+const setHtml = (el, h) => { if (el.__h !== h) { el.__h = h; el.innerHTML = h; } };
+const setTxt = (el, t) => { if (el.__t !== t) { el.__t = t; el.textContent = t; } };
+const pbL = $('#pb-l'), pbFill = $('#pb-fill'), pbThumb = $('#pb-thumb'), pbTrack = $('#pb-track'), rSub = $('#r-sub');
+function updateProgress(anchor) {
   if (!R.book || views.reader.hidden) return;
   const s = pageState();
   R.ps = s; pbSync(s); stProgress(s);
-  if (P.pbPct) {
-    const pct = s.cur / s.N * 100;
-    $('#pb-l').innerHTML = 'Прочитано <b>' + fmtPct(pct) + '</b>';
-  } else {
-    $('#pb-l').innerHTML = 'Прочитано <b>' + s.cur + '</b> из ' + s.N + ' стр.';
-  }
+  if (P.pbPct) setHtml(pbL, 'Прочитано <b>' + fmtPct(s.cur / s.N * 100) + '</b>');
+  else setHtml(pbL, 'Прочитано <b>' + s.cur + '</b> из ' + s.N + ' стр.');
   const q = Math.round(s.q * 1000) / 10;
-  $('#pb-fill').style.width = q + '%'; $('#pb-thumb').style.left = q + '%';
-  $('#pb-track').setAttribute('aria-valuenow', String(Math.round(q)));
+  if (R.pq !== q) { R.pq = q; pbFill.style.width = q + '%'; pbThumb.style.left = q + '%'; pbTrack.setAttribute('aria-valuenow', String(Math.round(q))); }
   if (!R.chrome) return;
-  if (R.kind === 'pdf') $('#r-sub').textContent = 'Стр. ' + s.cur + ' из ' + s.N;
+  if (R.kind === 'pdf') setTxt(rSub, 'Стр. ' + s.cur + ' из ' + s.N);
   else {
-    const a = R.hold || anchorNow();
-    if (a) {
-      R.ch = R.blocks[a.b].ch;
+    const a = anchor || R.hold || anchorNow();
+    const blk = a && R.blocks[a.b];
+    if (blk) {
+      R.ch = blk.ch;
       const c = R.book.chapters[R.ch];
-      $('#r-sub').textContent = (c && c.title ? c.title + ' · ' : '') + (R.ch + 1) + ' / ' + R.book.chapters.length;
+      setTxt(rSub, (c && c.title ? c.title + ' · ' : '') + (R.ch + 1) + ' / ' + R.book.chapters.length);
     }
   }
 }
@@ -2008,6 +2093,7 @@ function setChrome(on) {
 }
 let rafId = 0;
 scroller.addEventListener('scroll', () => {
+  R.lastScroll = performance.now();
   if (rafId || views.reader.hidden || isH()) return;
   rafId = requestAnimationFrame(() => {
     rafId = 0;
@@ -2015,7 +2101,7 @@ scroller.addEventListener('scroll', () => {
       R.hold = null;
       if (R.chrome && Math.abs(scroller.scrollTop - R.lastShow) > 90) setChrome(false);
     }
-    noteAnchor(); updateProgress(); persistSoon();
+    updateProgress(noteAnchor()); persistSoon();
   });
 }, { passive: true });
 
@@ -2125,7 +2211,11 @@ async function followLink(a) {
 }
 function leaveReader() { closeBook(true); show('lib'); renderLibrary(); }
 $('#b-back').addEventListener('click', () => { if (!NAV.pop('reader')) leaveReader(); });
-window.addEventListener('resize', () => { if (R.book && !views.reader.hidden) relayoutSoon(); });
+window.addEventListener('resize', () => {
+  if (!R.book || views.reader.hidden) return;
+  if (!isH() && R.lw && Math.abs(scroller.clientWidth - R.lw) < 2 && Math.abs(scroller.clientHeight - R.lh) < 160) return;   /* the browser's address bar sliding in and out */
+  relayoutSoon();
+});
 if (document.fonts && document.fonts.addEventListener) document.fonts.addEventListener('loadingdone', () => { if (R.book && R.kind === 'text' && !views.reader.hidden) relayoutSoon(); });
 bookEl.addEventListener('load', () => { if (R.book && R.kind === 'text') relayoutSoon(); }, true);
 
@@ -2288,13 +2378,15 @@ const handleSelection = debounce(() => {
   if (!bookEl.contains(r.commonAncestorContainer) && !pdfEl.contains(r.commonAncestorContainer)) return;
   const text = s.toString().replace(/\s+/g, ' ').trim();
   if (text.length < 2) return;
-  if (!/\s/.test(text)) {
-    const n = r.startContainer;
-    if (n.nodeType === 3 && isLetter(n.data[r.startOffset] || '')) { const hit = wordRangeIn(n, r.startOffset); if (hit.word) openWordFromHit(hit); }
-    return;
-  }
-  setHighlights(null, null);
-  showSentenceSheet(text.length > 1200 ? text.slice(0, 1200) : text, r.cloneRange());
+  /* a long press selects a word (or a stretch of text): offer to keep the word or its sentence in the notes; a single tap translates */
+  const n = r.startContainer, multi = /\s/.test(text);
+  let hit = null, ctx = null;
+  if (!multi) {
+    if (n.nodeType === 3 && isLetter(n.data[r.startOffset] || '')) hit = wordRangeIn(n, r.startOffset);
+    if (!hit || !hit.word) return;
+    ctx = contextFor(hit.node, hit.s);
+  } else if (n.nodeType === 3) ctx = contextFor(n, r.startOffset);
+  showPickSheet({ text: multi ? (text.length > 1200 ? text.slice(0, 1200) : text) : hit.word, range: r.cloneRange(), hit, ctx, multi });
 }, 700);
 document.addEventListener('selectionchange', () => {
   const s = getSelection();
@@ -4089,10 +4181,10 @@ function tourSteps() {
     { art: 'welcome', h: 'Читай и переводи', p: 'Книги на английском и арабском. Нажми на слово, чтобы увидеть перевод прямо в тексте. Короткое знакомство займёт полминуты.' },
     { art: 'add', h: 'Добавь книгу', p: 'Кнопка «Открыть книгу» берёт файл FB2, EPUB или PDF с телефона. Книга сохранится в приложении, второй раз выбирать файл не нужно.' },
     { art: 'pair', h: 'Две книги в одной строке', p: '«Две книги» связывает оригинал и перевод. В списке они стоят в одной строке: нажми EN или RU, чтобы читать на нужном языке. Язык можно сменить и внутри книги, на том же месте.' },
-    { art: 'tap', h: 'Нажми на слово', p: 'Тап по слову покажет перевод слова и предложения. Чтобы перевести фразу, выдели несколько слов. Закрыть окно можно жестом «назад» или тапом по тексту.' },
+    { art: 'tap', h: 'Нажми на слово', p: 'Тап по слову покажет перевод, а ниже — как это сказано в другой книге. Зажми слово: можно выбрать слово или предложение и добавить в заметки. Закрыть окно можно жестом «назад» или тапом по тексту.' },
     { art: 'panels', h: 'Панели и настройки', p: 'Тап по центру экрана показывает и прячет панели. Сверху: оглавление, перевод под абзацами и настройки «Aa» с темой, шрифтом и режимом листания. Внизу полоса прогресса.' },
     { art: 'parallel', h: 'Перевод рядом с текстом', p: 'Для пары книг включи перевод под абзацами. В горизонтальной ориентации оригинал будет слева, а перевод справа. Сопоставленные абзацы можно выгрузить в CSV.' },
-    { art: 'words', h: 'Слова в Anki', p: 'Кнопка «Сохранить слово» в окне перевода кладёт слово в коллекцию (закладка вверху главного экрана). Кнопка «Экспорт в Anki» там же выгружает файл для импорта.' }
+    { art: 'words', h: 'Коллекция и заметки', p: 'Звёздочка у слова кладёт его в коллекцию этой книги: у каждой книги своя, а слово подчёркивается в тексте. Закладка отправляет в заметки и красит место в тексте. Коллекция, заметки и экспорт в Anki открываются звёздочкой вверху главного экрана, а огонёк рядом показывает статистику и стрик.' },
   ];
   if (!IN_CLAUDE && /^https?:$/.test(location.protocol) && !standaloneNow()) {
     steps.push(isIOS()
@@ -4484,7 +4576,7 @@ async function backfillCovers() {
 }
 
 /* ---------- statistics: pages, time, new words, a streak and a reading plan — all kept on this device ---------- */
-const ST_KEY = 'rd.stats', ST_SEEN = 'rd.seen';
+const ST_KEY = 'rd.stats';
 const ST_MIN = 5;                       // with no plan, a day counts for the streak at this many pages
 ICON.flame = '<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12.3 2.2c.6 3.2 3.2 4.7 4.6 7.6 1.1 2.4 1 5.3-.8 7.5A6.2 6.2 0 0 1 12 20.2a6.2 6.2 0 0 1-4.7-2.1c-1.5-1.8-1.7-4.2-.7-6.3.4-.8.9-1.4 1.5-2 .2 1.2.7 2 1.6 2.4-.5-3.8.7-7.6 2.6-10z"/><path fill="#fff" fill-opacity=".55" d="M12 20.2a3.3 3.3 0 0 1-3.3-3.3c0-1.5.9-2.5 1.7-3.4.4.9 1 1.3 1.7 1.4.4-1.2 1-2 1.7-2.7.5 1.1.9 2 .9 3a3.3 3.3 0 0 1-2.7 5z"/></svg>';
 const stNow = () => (window.__RD_NOW ? window.__RD_NOW() : Date.now());
@@ -4494,11 +4586,11 @@ const stDate = k => { const [y, m, d] = k.split('-').map(Number); return new Dat
 const stAdd = (k, n) => { const d = stDate(k); d.setDate(d.getDate() + n); return stDay(d.getTime()); };
 const stDiff = (a, b) => Math.round((stDate(b) - stDate(a)) / 864e5);
 const stPl = (n, f) => { const a = Math.abs(n) % 100, b = a % 10; return a > 10 && a < 20 ? f[2] : b > 1 && b < 5 ? f[1] : b === 1 ? f[0] : f[2]; };
-const stDur = s => { const m = Math.round((s || 0) / 60), u = x => '<small>' + x + '</small>'; return m < 60 ? m + u('мин') : Math.floor(m / 60) + u('ч') + ' ' + st2(m % 60) + u('мин'); };
-const ST = { tab: 'books', sel: '', bk: null, hw: null, act: 0, bucket: 3, bt: 0, tt: 0, goalT: 0 };
+const stDur = s => { const m = Math.round((s || 0) / 60), u = x => '<small>' + x + '</small>'; return m < 60 ? m + u('мин') : Math.floor(m / 60) + ':' + st2(m % 60) + u('ч'); };
+const ST = { sel: '', bk: null, hw: null, act: 0, bucket: 3, bt: 0, tt: 0, goalT: 0 };
 
-/* the data: days {p pages, s seconds, w new words, hit}, n page counts of the books seen, plan */
-let SD = null, stT = 0, SEEN = null, seenT = 0;
+/* the data: days {p pages, s seconds, hit}, n page counts of the books seen, plan. New words are not stored here: they are the words added to the collection that day */
+let SD = null, stT = 0;
 function stLoad() {
   if (SD) return SD;
   const s = ls.get(ST_KEY, null) || {};
@@ -4513,8 +4605,7 @@ function stSave(now) {
   if (!SD) return;
   if (now) ls.set(ST_KEY, SD); else stT = setTimeout(() => { stT = 0; ls.set(ST_KEY, SD); }, 700);
 }
-function stReset() { clearTimeout(stT); stT = 0; SD = null; SEEN = null; ST.bk = null; ST.hw = null; ls.set(ST_KEY, null); ls.set(ST_SEEN, null); }
-const stSeen = () => SEEN || (SEEN = new Set((() => { const a = ls.get(ST_SEEN, []); return Array.isArray(a) ? a : []; })()));
+function stReset() { clearTimeout(stT); stT = 0; SD = null; ST.bk = null; ST.hw = null; ls.set(ST_KEY, null); }
 /* the plan's picture of today: where the book stood when the day began (so the goal does not shrink while you read) */
 function stRoll(now) {
   const P = stLoad().plan; if (!P) return;
@@ -4530,10 +4621,11 @@ function stGoal(t) {
   const left = Math.max(0, (1 - P.snap.q) * P.N), dl = Math.max(1, P.days - stDiff(P.start, t));
   return { plan: true, need: Math.max(1, Math.ceil(left / dl - 1e-6)), left, daysLeft: dl };
 }
+/* new words of a day: the words put into the collection (the Anki deck) on that day */
 function stAnki(k) {
-  let n = 0;
-  try { for (const w of Coll.all()) if (w.createdAt && stDay(w.createdAt) === k) n++; } catch { /* no collection yet */ }
-  return n;
+  const seen = new Set();   // the same word kept in two books is one new word
+  try { for (const w of Coll.all()) if (w.createdAt && stDay(w.createdAt) === k) seen.add(w.dk || w.id); } catch { /* no collection yet */ }
+  return seen.size;
 }
 function stStreak() {
   const D = stLoad(), t = stDay(), hit = k => !!(D.days[k] && D.days[k].hit);
@@ -4592,17 +4684,6 @@ function stTick() {
   row.s = (row.s || 0) + dt / 1000;
   stSave();
 }
-/* a word counts as new the first time it is looked up (its dictionary form, so "went" and "go" are one word) */
-function stWord(word, lemma) {
-  const k = normKey(lemma || word); if (!k || k.length > 60) return;
-  const seen = stSeen(); if (seen.has(k)) return;
-  seen.add(k);
-  clearTimeout(seenT); seenT = setTimeout(() => ls.set(ST_SEEN, [...seen]), 500);
-  const D = stLoad(), t = stDay(), row = D.days[t] || (D.days[t] = {});
-  row.w = (row.w || 0) + 1;
-  stSave();
-}
-
 /* ----- the goal reached: a small friendly card with a burst of confetti ----- */
 const stLine = sk => (sk.n >= 2 ? 'Стрик: ' + sk.n + ' ' + stPl(sk.n, ['день', 'дня', 'дней']) + ' подряд.' : 'Стрик начался — приходи завтра.');
 function stHideGoal() {
@@ -4631,24 +4712,23 @@ function stCelebrate(kind) {
   el.innerHTML = `<div class="goal-in"><span class="goal-ic">${ICON.check}</span><span class="goal-tx"><b>${esc(t)}</b><span>${esc(s)}</span></span><span class="goal-c" aria-hidden="true">${conf}</span></div>`;
   el.hidden = false;
   ST.goalT = setTimeout(stHideGoal, 5600);
-  if (ST.tab === 'stats' && curView === 'lib') stRender();
+  if (curView === 'stats') stRender();
 }
 
-/* ----- the tab ----- */
+/* ----- the flame button in the library header, and the statistics screen it opens ----- */
 function stBadge() {
-  const n = $('#tab-n'); if (!n) return;
+  const b = $('#b-stat-lib'); if (!b) return;
   const sk = stStreak();
-  n.innerHTML = sk.n > 0 ? ICON.flame + '<span>' + sk.n + '</span>' : '';
-  n.setAttribute('aria-label', sk.n > 0 ? 'Стрик: ' + sk.n + ' ' + stPl(sk.n, ['день', 'дня', 'дней']) : '');
+  b.innerHTML = ICON.flame + '<i class="st-n">' + (sk.n > 0 ? sk.n : '') + '</i>';
+  b.classList.toggle('on', sk.today); b.classList.toggle('off', sk.n === 0);
+  b.setAttribute('aria-label', 'Статистика' + (sk.n > 0 ? '. Стрик: ' + sk.n + ' ' + stPl(sk.n, ['день', 'дня', 'дней']) : ''));
 }
-function stTab(t) {
-  ST.tab = t === 'stats' ? 'stats' : 'books';
-  const s = ST.tab === 'stats';
-  $('#lib-main').hidden = s; $('#lib-stats').hidden = !s;
-  for (const b of $$('#lib-tabs [data-tab]')) b.setAttribute('aria-selected', String(b.dataset.tab === ST.tab));
-  if (s) { ST.sel = stDay(); stRender(); try { scrollTo(0, 0); } catch { /* ignore */ } }
+function stOpen() {
+  ST.sel = stDay(); stRender();
+  show('stats'); NAV.push('stats', () => show('lib'));
+  const r = $('#v-stats'); if (r) r.scrollTop = 0;
 }
-function stRefresh() { stBadge(); if (ST.tab === 'stats') stRender(); }
+function stRefresh() { stBadge(); if (curView === 'stats') stRender(); }
 const stMon = ['янв', 'фев', 'мар', 'апр', 'мая', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'];
 const stWd = ['вс', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб'];
 function stDayName(k, today) {
@@ -4672,7 +4752,7 @@ function stPlanCard(D, g, got) {
   return `<section class="card st-plan">${h}${head}<div class="st-goal"><b>${got}</b><span>из ${g.need} стр. сегодня</span>${reached ? '<em class="st-done">' + ICON.check + 'Цель выполнена</em>' : ''}</div><div class="st-bar${reached ? ' full' : ''}" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${pct}" aria-label="Цель на сегодня"><i style="width:${pct}%"></i></div><p class="st-sub">${esc(sub)}</p></section>`;
 }
 function stRender() {
-  const root = $('#lib-stats'); if (!root) return;
+  const root = $('#st-root'); if (!root) return;
   const D = stLoad(); stRoll();
   const today = stDay(), days = []; for (let i = 6; i >= 0; i--) days.push(stAdd(today, -i));
   const sel = days.includes(ST.sel) ? ST.sel : today;
@@ -4687,7 +4767,7 @@ function stRender() {
     return `<button type="button" class="wk${r.hit ? ' hit' : ''}${k === today ? ' today' : ''}" data-day="${k}" aria-pressed="${k === sel}" aria-label="${esc(stDayName(k, today))}: ${p} стр.${r.hit ? ', день засчитан' : ''}"><span class="wk-bar"><i style="height:${h}%"></i></span><span class="wk-d">${stWd[stDate(k).getDay()]}</span><span class="wk-ck">${r.hit ? ICON.check : ''}</span></button>`;
   }).join('');
   const r = D.days[sel] || {};
-  const tiles = [[Math.round(r.p || 0), 'Страниц'], [r.w || 0, 'Новых слов'], [stAnki(sel), 'В Anki'], [stDur(r.s), 'Время']].map(([v, l]) => `<div class="card st-t"><b>${v}</b><span>${l}</span></div>`).join('');
+  const tiles = [[Math.round(r.p || 0), 'Страниц'], [stAnki(sel), 'Новых слов'], [stDur(r.s), 'Время']].map(([v, l]) => `<div class="card st-t"><b>${v}</b><span>${l}</span></div>`).join('');
   root.innerHTML = streak + stPlanCard(D, g, got) + `<h2 class="sec-h st-sec">${esc(stDayName(sel, today))}</h2><div class="st-week" role="group" aria-label="Последние семь дней">${wk}</div><div class="st-tiles">${tiles}</div>`;
 }
 
@@ -4766,14 +4846,18 @@ function stStartPlan(books, S) {
 }
 function stClick(e) {
   const b = e.target.closest('[data-st],[data-day]'); if (!b) return;
-  if (b.dataset.day) { ST.sel = b.dataset.day; stRender(); const n = $('[data-day="' + ST.sel + '"]', $('#lib-stats')); if (n) { try { n.focus({ preventScroll: true }); } catch { /* ignore */ } } return; }
+  if (b.dataset.day) { ST.sel = b.dataset.day; stRender(); const n = $('[data-day="' + ST.sel + '"]', $('#st-root')); if (n) { try { n.focus({ preventScroll: true }); } catch { /* ignore */ } } return; }
   if (b.dataset.st === 'plan') stOpenPlan();
   else if (b.dataset.st === 'open') stOpenPlanBook();
 }
 function stInit() {
   for (const ev of ['pointerdown', 'touchstart', 'touchmove', 'keydown', 'wheel', 'mousedown']) window.addEventListener(ev, stAct, { passive: true, capture: true });
-  $('#lib-tabs').addEventListener('click', e => { const b = e.target.closest('[data-tab]'); if (b) stTab(b.dataset.tab); });
-  $('#lib-stats').addEventListener('click', stClick);
+  $('#b-stat-lib').addEventListener('click', stOpen);
+  $('#b-stat-back').innerHTML = ICON.back;
+  $('#b-stat-back').addEventListener('click', () => { if (!NAV.pop('stats')) show('lib'); });
+  $('#b-theme3').addEventListener('click', toggleTheme);
+  $('#st-root').addEventListener('click', stClick);
+  Coll.subs.add(() => { if (curView === 'stats') stRender(); });
   $('#goal').addEventListener('click', stHideGoal);
   ST.tt = stNow();
   setInterval(stTick, 5000);
@@ -4781,7 +4865,132 @@ function stInit() {
   document.addEventListener('visibilitychange', () => { if (document.hidden) stSave(true); });
   stRoll(); stBadge();
 }
-if (window.__RD_TEST) window.__rdst = { load: stLoad, save: stSave, reset: stReset, progress: stProgress, tick: stTick, act: stAct, jump: stJump, word: stWord, goal: stGoal, streak: stStreak, render: stRender, tab: stTab, day: stDay, add: stAdd, refresh: stRefresh, state: ST, openPlan: stOpenPlan, hide: stHideGoal, celebrate: stCelebrate };
+if (window.__RD_TEST) window.__rdst = { load: stLoad, save: stSave, reset: stReset, progress: stProgress, tick: stTick, act: stAct, jump: stJump, anki: stAnki, goal: stGoal, streak: stStreak, render: stRender, open: stOpen, day: stDay, add: stAdd, refresh: stRefresh, state: ST, openPlan: stOpenPlan, hide: stHideGoal, celebrate: stCelebrate };
+
+/* ---------- the book's own collection and the bookmarks, shown in its text ---------- */
+/* Every book has its own collection: an entry knows its book (bookId). Entries from before that are matched by the book's title. */
+const inBook = e => {
+  if (!R.meta || !R.book) return false;
+  if (e.bookId) return e.bookId === R.meta.id;
+  return !!e.book && e.book === cut(R.book.title, 120);
+};
+const bookKeyOf = e => e.bookId || (e.book ? 't:' + e.book : '');
+const wordKeys = e => [e.surface, e.lemma].map(normKey).filter(k => k && k.length < 40 && !/\s/.test(k));
+/* the saved entry of this book for a word (its form or its dictionary form), or null */
+function savedEntry(word, lemma) {
+  const a = normKey(word), b = lemma ? normKey(lemma) : '';
+  if (!a) return null;
+  for (const e of Coll.all()) {
+    if (e.kind === 'sentence' || !inBook(e)) continue;
+    const ks = wordKeys(e);
+    if (ks.includes(a) || (b && ks.includes(b))) return e;
+  }
+  return null;
+}
+function collKeys() {
+  const keys = new Set();
+  for (const e of Coll.all()) if (e.kind !== 'sentence' && inBook(e)) for (const k of wordKeys(e)) keys.add(k);
+  return keys;
+}
+
+/* text nodes of a chapter, the parallel translation under the paragraphs left out: a position is a number of characters from the chapter's start */
+const skipTr = { acceptNode: n => (n.parentElement && n.parentElement.closest('.par-tr') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT) };
+function chapPos(node, off) {
+  const sec = node && node.parentElement && node.parentElement.closest('.chap');
+  if (!sec) return null;
+  const w = document.createTreeWalker(sec, NodeFilter.SHOW_TEXT, skipTr);
+  let pos = 0, n;
+  while ((n = w.nextNode())) { if (n === node) return { ch: +sec.dataset.ch, off: pos + off }; pos += n.data.length; }
+  return null;
+}
+function rangeAtPos(ch, off, len) {
+  const sec = bookEl.querySelector('.chap[data-ch="' + ch + '"]');
+  if (!sec) return null;
+  const w = document.createTreeWalker(sec, NodeFilter.SHOW_TEXT, skipTr);
+  let pos = 0, n, sn = null, so = 0, en = null, eo = 0;
+  while ((n = w.nextNode())) {
+    const e1 = pos + n.data.length;
+    if (!sn && off < e1) { sn = n; so = off - pos; }
+    if (sn && off + len <= e1) { en = n; eo = off + len - pos; break; }
+    pos = e1;
+  }
+  if (!sn || !en) return null;
+  try { const r = document.createRange(); r.setStart(sn, so); r.setEnd(en, eo); return r; } catch { return null; }
+}
+const flatTxt = s => String(s || '').replace(/\s+/g, ' ').trim();
+
+/* ----- the notes: a word or a sentence marked in the text ----- */
+function noteIdFor(kind, text, range) {
+  const pos = R.kind === 'text' && range ? chapPos(range.startContainer, range.startOffset) : null;
+  const len = pos ? range.toString().length : 0;
+  return 'n' + hash2([R.meta ? R.meta.id : '', kind, pos ? pos.ch + ':' + pos.off + ':' + len : normKey(text)].join('|'));
+}
+function noteEntry({ kind, text, sentence, tr, range }) {
+  const pos = R.kind === 'text' && range ? chapPos(range.startContainer, range.startOffset) : null;
+  return {
+    id: noteIdFor(kind, text, range), kind, text: cut(flatTxt(text), 1200),
+    sentence: kind === 'word' ? cut(flatTxt(sentence), 700) : '', tr: cut(tr || '', 700),
+    bookId: R.meta ? R.meta.id : '', book: R.book ? cut(R.book.title, 120) : '',
+    ch: pos ? pos.ch : undefined, off: pos ? pos.off : undefined, len: pos ? range.toString().length : undefined,
+    createdAt: Date.now()
+  };
+}
+async function toggleNote(spec) {
+  const en = noteEntry(spec);
+  try {
+    if (Notes.has(en.id)) { await Notes.remove(en.id); toast('Убрано из заметок'); return false; }
+    await Notes.save(en); toast('Добавлено в заметки'); return true;
+  } catch { toast('Не удалось сохранить, попробуй ещё раз'); return Notes.has(en.id); }
+}
+
+/* ----- painting: the underline for the words of the collection, a colour for the bookmarks ----- */
+let mkScan = 0;
+function clearMarks() { mkScan++; if (hlOK) { CSS.highlights.delete('rd-coll'); CSS.highlights.delete('rd-mark'); } }
+function refreshMarks() {
+  if (!hlOK) return;
+  if (!R.book || R.kind !== 'text' || !R.meta || !R.blocks.length) { CSS.highlights.delete('rd-mark'); return; }
+  const hl = new Highlight(); hl.priority = -1;
+  for (const n of Notes.all()) {
+    if (n.bookId !== R.meta.id || n.ch == null || n.off == null) continue;
+    const r = rangeAtPos(n.ch, n.off, n.len);
+    if (r && flatTxt(r.toString()) === flatTxt(n.text)) hl.add(r);
+  }
+  if (hl.size) CSS.highlights.set('rd-mark', hl); else CSS.highlights.delete('rd-mark');
+}
+const RE_WORD = /[\p{L}\p{M}\p{N}]+(?:['’][\p{L}\p{M}\p{N}]+)*/gu;
+/* every occurrence of a saved word in the book, found a little at a time so the page never stalls */
+function scanColl() {
+  const tok = ++mkScan;
+  if (!hlOK) return;
+  if (!R.book || R.kind !== 'text' || !R.meta || !R.blocks.length) { CSS.highlights.delete('rd-coll'); return; }
+  const keys = collKeys();
+  if (!keys.size) { CSS.highlights.delete('rd-coll'); return; }
+  const hl = new Highlight(); hl.priority = -2;
+  const fresh = !CSS.highlights.has('rd-coll');
+  if (fresh) CSS.highlights.set('rd-coll', hl);
+  const w = document.createTreeWalker(bookEl, NodeFilter.SHOW_TEXT, skipTr);
+  const step = () => {
+    if (tok !== mkScan) return;
+    const t0 = performance.now();
+    let n;
+    while ((n = w.nextNode())) {
+      const d = n.data; RE_WORD.lastIndex = 0;
+      let m;
+      while ((m = RE_WORD.exec(d))) {
+        if (!keys.has(normKey(m[0]))) continue;
+        const r = document.createRange(); r.setStart(n, m.index); r.setEnd(n, m.index + m[0].length); hl.add(r);
+      }
+      if (performance.now() - t0 > 6) { setTimeout(step, 14); return; }
+    }
+    if (!fresh) CSS.highlights.set('rd-coll', hl);
+    else if (!hl.size) CSS.highlights.delete('rd-coll');
+  };
+  step();
+}
+const refreshCollSoon = debounce(scanColl, 160), refreshMarksSoon = debounce(refreshMarks, 120);
+function refreshAllMarks() { refreshMarks(); scanColl(); }
+Coll.subs.add(() => { if (R.book && !views.reader.hidden) refreshCollSoon(); });
+Notes.subs.add(() => { if (R.book && !views.reader.hidden) refreshMarksSoon(); });
 
 /* ---------- the translation sheet ---------- */
 const sheetEl = $('#sheet'), sheetIn = $('#sheet-in');
@@ -4845,7 +5054,7 @@ function runPart(st, part) {
   st[part] = { st: 'loading' };
   translate(spec, st.ctl.signal).then(v => {
     if (S !== st || st['t' + part] !== tok) return;
-    st[part] = { st: 'ok', v }; if (part === 'w') stWord(st.word, v && v.lemma);
+    st[part] = { st: 'ok', v };
     paint();
   }, e => {
     if (S !== st || st['t' + part] !== tok || (e && e.code === 'cancelled')) return;
@@ -4932,6 +5141,7 @@ function showSentenceSheet(text, range) {
 /* the raw close: used by the history (back gesture) and by screen changes; closeSheet() goes through the history */
 function closeSheetRaw(now) {
   if (S && S.ctl) S.ctl.abort();
+  if (S && S.kind === 'pick') dropSelection();
   S = null;
   document.body.classList.remove('sheet-open');
   document.documentElement.style.setProperty('--sheet-h', '0px');
@@ -4956,113 +5166,142 @@ function errHtml(st, part) {
 }
 const skel = (w, h = 1) => `<div class="skel" style="width:${w}%;height:${h}em"></div>`;
 
-function topHtml(st) {
-  let pair;
-  if (st.pair) pair = `<span class="pill">${shortLang(st.lang)} → ${shortLang(st.pairLang)}</span><span class="pill pill-pair" title="Значение берётся из второй книги">⇄ две книги</span>`;
-  else if (st.lang === 'ar') pair = '<span class="pill">AR → RU</span>';
-  else pair = `<span class="pill">EN</span><span class="muted" aria-hidden="true">→</span><span class="seg" role="group" aria-label="Язык перевода"><button type="button" data-act="target" data-v="ru" aria-pressed="${P.latinTarget === 'ru'}">RU</button><button type="button" data-act="target" data-v="ar" aria-pressed="${P.latinTarget === 'ar'}">AR</button></span>`;
-  return `<div class="grip"></div><div class="sh-top"><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">${st.kind === 'note' ? '' : pair}</div><button class="icon-btn" data-act="close" aria-label="Закрыть">${ICON.close}</button></div>`;
+/* The sheet is small on purpose: the word with its tools (star: the collection of this book, bookmark: the notes), the word's translation, and below it what the other book says. */
+const savedWord = st => savedEntry(st.word, st.w && st.w.st === 'ok' ? st.w.v.lemma : '');
+const noteKind = st => (st.kind === 'word' ? 'word' : 'sentence');
+const noteIdOf = st => st._nid || (st._nid = noteIdFor(noteKind(st), st.kind === 'word' ? st.word : st.sentence, st.range));
+function isSaved(st) {
+  if (st.kind === 'word') return !!savedWord(st);
+  const en = entryOf(st); return !!en && Coll.has(en.id);
 }
-function mtBody(st) {
-  const ar = st.sentTarget === 'ar';
-  if (st.s.st === 'loading') return skel(92, 1.2) + skel(70, 1.2);
-  if (st.s.st === 'err') return errOwner(st, 's') ? errHtml(st, 's') : '';
-  if (st.s.st === 'ok') return `<div class="sh-sent${ar ? ' ar' : ''}" dir="${ar ? 'rtl' : 'auto'}">${esc(st.s.v.translation)}</div>`;
-  return '';
-}
-function sentenceBlock(st, label, withBold) {
-  const orig = withBold ? boldIn(st.sentence, st.word, st.wordIdx) : esc(st.sentence);
-  return `<div class="lbl sh-lbl">${label}</div><div class="sh-orig${st.sentLang === 'ar' ? ' ar' : ''}"${dirAttr(st.sentence)}>${orig}</div>${mtBody(st)}`;
+const toolBtn = (act, on, label, icon, dis) => `<button class="icon-btn sh-ic" data-act="${act}" aria-pressed="${on}" aria-label="${esc(label)}"${dis ? ' disabled' : ''}>${icon}</button>`;
+function toolsHtml(st) {
+  const sv = isSaved(st), mk = Notes.has(noteIdOf(st)), can = sv || !!entryOf(st);
+  return `<div class="sh-tools">${toolBtn('save', sv, sv ? 'Убрать из коллекции этой книги' : 'В коллекцию этой книги', ICON.coll, !can)}${toolBtn('mark', mk, mk ? 'Убрать закладку' : 'В закладки', ICON.mark)}<button class="icon-btn" data-act="${st.kind === 'word' ? 'speak-w' : 'speak-s'}" aria-label="Произнести">${ICON.speak}</button><button class="icon-btn" data-act="close" aria-label="Закрыть">${ICON.close}</button></div>`;
 }
 const bookTitle = st => esc(cut(st.pairTitle, 48));
 const retryBtn = (part, label) => `<button class="btn btn-soft" data-act="retry" data-part="${part}">${label || 'Повторить'}</button>`;
-/* the translator's version of the tapped word */
-function pairWordBlock(st) {
+const skelLines = () => skel(92, 1.15) + skel(64, 1.15);
+const trDiv = (cls, t, tar) => `<div class="${cls}${tar ? ' ar' : ''}" dir="${tar ? 'rtl' : 'auto'}">${t}</div>`;
+/* the translation of the sentence made by the engine */
+function ctxMt(st, big) {
+  if (!canMT(st)) return '';
+  if (st.s.st === 'loading') return skelLines();
+  if (st.s.st === 'err') return errOwner(st, 's') ? errHtml(st, 's') : '';
+  if (st.s.st === 'ok') return trDiv(big ? 'sh-sent' : 'sh-ps', esc(st.s.v.translation), st.sentTarget === 'ar');
+  return '';
+}
+/* the sentence from the other book */
+function pairSent(st, big) {
+  const ex = pairEx(st);
+  if (ex) return trDiv(big ? 'sh-sent' : 'sh-ps', boldAny(ex.other, ex.phrase), detectLang(ex.other) === 'ar');
+  return st.p.st === 'loading' ? skelLines() : '';
+}
+const mtBtn = st => (canMT(st) && st.s.st === 'none' && st.p.st !== 'loading' ? '<button class="btn btn-ghost sh-mt" data-act="mt">Машинный перевод</button>' : '');
+/* the other book's word */
+function pairPhrase(st) {
   const p = st.p;
-  let h = `<div class="lbl sh-lbl">В книге «${bookTitle(st)}»</div>`;
-  if (p.st === 'loading') return h + skel(58, 1.7) + skel(36);
-  if (p.st === 'err') return h + (errOwner(st, 'p') ? errHtml(st, 'p') : '');
+  if (p.st === 'loading') return pairEx(st) && pairEx(st).phrase ? '' : skel(48, 1.5);
+  if (p.st === 'err') return errOwner(st, 'p') ? errHtml(st, 'p') : '';
   if (p.st !== 'ok') return '';
   const v = p.v;
-  if (!v.found && v.mt) return '';
-  if (!v.found) return h + `<div class="err"><span>Слово во второй книге определить не удалось${st.d ? ', предложение ниже найдено по положению в книге' : canMT(st) ? ', ниже машинный перевод' : ''}.</span>${retryBtn('p')}</div>`;
-  if (v.phrase) {
-    const ar = detectLang(v.phrase) === 'ar';
-    h += `<div class="sh-tr sh-book${ar ? ' ar' : ''}" dir="${ar ? 'rtl' : 'auto'}">${esc(v.phrase)}</div>`;
-    if (v.lemma && normKey(v.lemma) !== normKey(v.phrase)) h += `<div class="sh-alt">начальная форма: ${arSpan(v.lemma)}</div>`;
-  } else h += '<div class="sh-sub">Отдельным словом здесь не переведено, смотри предложение ниже.</div>';
-  if (v.note) h += `<div class="sh-more">${esc(v.note)}</div>`;
-  if (st.poor) h += '<div class="sh-more">Книги сопоставились неуверенно, место могло сдвинуться.</div>';
-  return h;
+  if (v.found && v.phrase) return trDiv('sh-tr sh-book', esc(v.phrase), detectLang(v.phrase) === 'ar');
+  if (v.found || v.mt || st.d) return '';
+  return `<div class="err"><span>В другой книге слово не найдено.</span>${retryBtn('p')}</div>`;
 }
-function pairSentenceBlock(st, label, withBold) {
-  const p = st.p, ex = pairEx(st), orig = withBold ? boldIn(st.sentence, st.word, st.wordIdx) : esc(st.sentence);
-  let h = `<div class="lbl sh-lbl">${label}</div><div class="sh-orig${st.sentLang === 'ar' ? ' ar' : ''}"${dirAttr(st.sentence)}>${orig}</div>`;
-  if (ex) {
-    const ar = detectLang(ex.other) === 'ar';
-    h += `<div class="sh-src">В книге «${bookTitle(st)}»${ex.src === 'align' ? (p.st === 'loading' ? ' · уточняю…' : ' · по положению в книге') : ''}</div><div class="sh-sent${ar ? ' ar' : ''}" dir="${ar ? 'rtl' : 'auto'}">${boldAny(ex.other, ex.phrase)}</div>`;
-    if (ex.src === 'align' && p.st === 'ok') h += '<div class="sh-more">Не подтверждено: в этом месте книги могли разойтись.</div>';
-    else if (ex.src === 'align' && st.poor && p.st !== 'loading') h += '<div class="sh-more">Книги сопоставились неуверенно, место могло сдвинуться.</div>';
-  } else if (p.st === 'loading') h += skel(92, 1.2) + skel(70, 1.2);
-  else if (st.kind === 'sentence' && p.st === 'err') h += errOwner(st, 'p') ? errHtml(st, 'p') : '';
-  else if (st.kind === 'sentence' && p.st === 'ok') h += `<div class="err"><span>Во второй книге этого места не нашлось${canMT(st) ? ', ниже машинный перевод' : ''}.</span>${retryBtn('p')}</div>`;
-  if (st.kind === 'sentence' && ex && p.st === 'err' && errOwner(st, 'p')) h += errHtml(st, 'p');
-  if (canMT(st)) {
-    if (st.s.st === 'none') { if (p.st !== 'loading') h += '<button class="btn btn-ghost sh-mt" data-act="mt">Показать машинный перевод</button>'; }
-    else h += '<div class="sh-src">Машинный перевод по смыслу</div>' + mtBody(st);
-  }
-  return h;
-}
-function dictBlock(st) {
+/* the translation of the word itself */
+function dictField(st) {
   const w = st.w;
-  let h = '';
   if (w.st === 'ok') {
-    const v = w.v, parts = metaParts(v, st.word);
-    if (parts.length && !st.pair) h += `<div class="sh-sub">${parts.join(' · ')}</div>`;
-    if (v.form && !st.pair) h += `<div class="sh-form">${esc(v.form)}</div>`;
-    const tar = st.target === 'ar';
-    h += `<div class="lbl sh-lbl">${st.pair ? 'Словарь, вне контекста' : 'Перевод слова'}</div>`;
-    h += `<div class="sh-tr${tar ? ' ar' : ''}${st.pair ? ' sh-dict' : ''}" dir="${tar ? 'rtl' : 'auto'}">${esc(v.translations[0])}</div>`;
-    if (v.translations.length > 1) h += `<div class="sh-alt">${v.translations.slice(1).map(t => (tar ? `<span class="ar" dir="rtl">${esc(t)}</span>` : esc(t))).join(' · ')}</div>`;
-    if (st.pair && parts.length) h += `<div class="sh-sub">${parts.join(' · ')}</div>`;
-    if (v.form && st.pair) h += `<div class="sh-form">${esc(v.form)}</div>`;
-    if (v.others.length) h += `<div class="sh-more">Другое чтение: ${v.others.map(o => (o.v ? `<span class="ar" dir="rtl">${esc(o.v)}</span> — ` : '') + esc(o.tr)).join('; ')}</div>`;
-  } else if (w.st === 'loading') {
-    h += `<div class="lbl sh-lbl">${st.pair ? 'Словарь, вне контекста' : 'Перевод слова'}</div>` + skel(55, 1.7) + skel(34);
-  } else if (w.st === 'err') {
-    h += errOwner(st, 'w') ? errHtml(st, 'w') : '';
+    const v = w.v, tar = st.target === 'ar';
+    const alt = v.translations.slice(1, 3).map(t => (tar ? `<span class="ar" dir="rtl">${esc(t)}</span>` : esc(t))).join(' · ');
+    return trDiv('sh-tr', esc(v.translations[0]), tar) + (alt ? `<div class="sh-alt">${alt}</div>` : '');
   }
+  if (w.st === 'loading') {
+    const sv = savedWord(st), t = sv && ((sv.translations && sv.translations[0]) || sv.bookPhrase);
+    return t ? trDiv('sh-tr', esc(t), detectLang(t) === 'ar') : skel(55, 1.7);
+  }
+  if (w.st === 'err') return errOwner(st, 'w') ? errHtml(st, 'w') : '';
+  return '';
+}
+function buildWord(st) {
+  const ar = st.lang === 'ar';
+  let h = `<div class="grip"></div><div class="sh-head"><div class="sh-word${ar ? ' ar' : ''}"${dirAttr(st.word)}>${esc(st.word)}</div>${toolsHtml(st)}</div>`;
+  if (savedWord(st)) h += `<div class="sh-saved">${ICON.check}<span>Уже в коллекции</span></div>`;
+  let top, bottom;
+  if (st.lang === 'ru') { top = pairPhrase(st); bottom = pairSent(st); }
+  else {
+    top = dictField(st);
+    bottom = st.pair ? pairPhrase(st) + (pairSent(st) || ctxMt(st) || mtBtn(st)) : ctxMt(st);
+  }
+  h += `<div class="sh-f">${top}</div>`;
+  if (bottom) h += `<div class="sh-f sh-f2">${bottom}</div>`;
   return h;
 }
-const actsHtml = (word) => `<div class="acts"><button class="btn btn-primary" id="sv" data-act="save"></button><button class="btn btn-soft sq" data-act="copy" aria-label="Копировать">${ICON.copy}</button><button class="btn btn-soft sq" data-act="speak-s" aria-label="${word ? 'Произнести предложение' : 'Произнести'}">${ICON.speak}</button></div>`;
+function buildSentence(st) {
+  let h = `<div class="grip"></div><div class="sh-head sh-head-s">${toolsHtml(st)}</div>`;
+  h += `<div class="sh-orig${st.sentLang === 'ar' ? ' ar' : ''}"${dirAttr(st.sentence)}>${esc(st.sentence)}</div>`;
+  let f = '';
+  if (st.pair) {
+    f = pairSent(st, true);
+    if (!f && st.p.st === 'err' && errOwner(st, 'p')) f = errHtml(st, 'p');
+    if (!f && st.p.st === 'ok' && st.s.st === 'none') f = `<div class="err"><span>В другой книге этого места нет.</span>${retryBtn('p')}</div>`;
+    if (!pairEx(st)) f += ctxMt(st, true) + mtBtn(st);
+  } else f = ctxMt(st, true);
+  return h + (f ? `<div class="sh-f sh-f2">${f}</div>` : '');
+}
+/* a long press: pick what to keep (the word or its sentence) and put it into the notes */
+const pickUnit = st => st.units.find(u => u.id === st.unit) || st.units[0];
+const unitKind = u => (u.id === 'word' ? 'word' : 'sentence');
+function buildPick(st) {
+  const u = pickUnit(st), on = Notes.has(noteIdFor(unitKind(u), u.text, u.range));
+  const seg = st.units.length > 1 ? `<span class="seg" role="group" aria-label="Что сохранить">${st.units.map(x => `<button type="button" data-act="unit" data-v="${x.id}" aria-pressed="${x.id === u.id}">${x.label}</button>`).join('')}</span>` : '<span></span>';
+  const ar = detectLang(u.text) === 'ar';
+  return `<div class="grip"></div><div class="sh-top">${seg}<button class="icon-btn" data-act="close" aria-label="Закрыть">${ICON.close}</button></div>`
+    + `<div class="sh-pick${ar ? ' ar' : ''}"${dirAttr(u.text)}>${esc(cut(u.text, 500))}</div>`
+    + `<div class="acts"><button class="btn btn-primary" data-act="note" aria-pressed="${on}">${on ? ICON.check : ICON.mark}<span>${on ? 'В заметках' : 'В заметки'}</span></button><button class="btn btn-soft" data-act="tr">Перевести</button></div>`;
+}
+function pickHighlights(st) {
+  const u = pickUnit(st);
+  if (u.id === 'word') setHighlights(st.ctx && st.ctx.range, u.range);
+  else if (u.id === 'sent') setHighlights(u.range, null);
+  else setHighlights(null, null);
+}
+const dropSelection = () => { const s = getSelection(); if (s && s.removeAllRanges) s.removeAllRanges(); };
+function showPickSheet({ text, range, hit, ctx, multi }) {
+  if (detectLang(text) === 'other') return;
+  const units = [multi || !hit ? { id: 'sel', label: 'Выделенное', text, range } : { id: 'word', label: 'Слово', text: hit.word, range: hit.range }];
+  if (ctx && ctx.sentence && ctx.range && flatTxt(ctx.sentence).length > flatTxt(units[0].text).length + 2) units.push({ id: 'sent', label: 'Предложение', text: ctx.sentence, range: ctx.range });
+  const st = begin({ kind: 'pick', units, unit: units[0].id, hit, ctx, range });
+  paint(); pickHighlights(st);
+}
+async function pickNote(st) {
+  const u = pickUnit(st);
+  const on = await toggleNote({ kind: unitKind(u), text: u.text, sentence: st.ctx ? st.ctx.sentence : '', range: u.range });
+  if (on) { dropSelection(); closeSheet(); } else if (S === st) paint();
+}
+function pickTranslate(st) {
+  const u = pickUnit(st);
+  dropSelection();
+  if (u.id === 'word' && st.hit) openWordFromHit(st.hit);
+  else { setHighlights(null, null); showSentenceSheet(u.text, u.range); }
+}
 function buildSheet(st) {
-  if (st.kind === 'note') return `${topHtml(st)}<div class="sh-word">${esc(st.title)}</div><div class="sh-sub">${esc(st.msg)}</div>`;
-  let h = topHtml(st);
-  if (st.kind === 'sentence') {
-    h += st.pair ? pairSentenceBlock(st, 'Выделенный текст', false) : sentenceBlock(st, 'Выделенный текст · перевод по смыслу', false);
-    return h + actsHtml(false);
-  }
-  const ar = st.lang === 'ar';
-  h += `<div class="sh-word-row"><div class="sh-word${ar ? ' ar' : ''}"${dirAttr(st.word)}>${esc(st.word)}</div><button class="icon-btn" data-act="speak-w" aria-label="Произнести слово">${ICON.speak}</button></div>`;
-  if (st.pair) h += pairWordBlock(st);
-  if (st.lang !== 'ru') h += dictBlock(st);
-  if (st.sentence && st.sentence !== st.word && (st.sentLang === 'ar' || st.sentLang === 'latin' || st.sentLang === 'ru')) {
-    h += '<hr>' + (st.pair ? pairSentenceBlock(st, 'Предложение', true) : sentenceBlock(st, 'Предложение · по смыслу', true));
-  }
-  return h + actsHtml(true);
+  if (st.kind === 'note') return `<div class="grip"></div><div class="sh-head"><div class="sh-word">${esc(st.title)}</div><div class="sh-tools"><button class="icon-btn" data-act="close" aria-label="Закрыть">${ICON.close}</button></div></div><div class="sh-sub">${esc(st.msg)}</div>`;
+  if (st.kind === 'pick') return buildPick(st);
+  return st.kind === 'sentence' ? buildSentence(st) : buildWord(st);
 }
 function paint() {
   if (!S || sheetEl.hidden) return;
   const top = sheetEl.scrollTop;
   sheetIn.innerHTML = buildSheet(S);
   sheetEl.scrollTop = top;
-  refreshSave();
 }
 
 /* ---------- saving to the collection ---------- */
 function entryOf(st) {
   if (!st) return null;
-  const book = R.book ? cut(R.book.title, 120) : '';
+  const book = R.book ? cut(R.book.title, 120) : '', bid = R.meta ? R.meta.id : '';
   const pf = st.pair && st.p.st === 'ok' && st.p.v.found ? st.p.v : null, pe = st.pair ? pairEx(st) : null;
   if (st.kind === 'word') {
     const dict = st.w.st === 'ok' ? st.w.v : null;
@@ -5071,7 +5310,7 @@ function entryOf(st) {
     const idKey = st.lang === 'ru' ? ['word', 'ru', normKey(base)] : ['word', st.target, normKey(base)];
     const mt = st.s.st === 'ok' ? st.s.v.translation : '';
     return {
-      id: 'w' + hash2(idKey.join('|')), kind: 'word', src: tagOf(st.lang), target: st.lang === 'ru' ? st.pairLang === 'ar' ? 'ar' : 'en' : st.target,
+      id: 'w' + hash2(idKey.concat(bid).join('|')), dk: 'w' + hash2(idKey.join('|')), bookId: bid, kind: 'word', src: tagOf(st.lang), target: st.lang === 'ru' ? st.pairLang === 'ar' ? 'ar' : 'en' : st.target,
       surface: st.word, lemma: dict ? dict.lemma : '', lemmaVoc: dict ? dict.lemmaVoc : '', pos: dict ? dict.pos : '', form: dict ? dict.form : '',
       translations: dict ? dict.translations : [pf.phrase], translit: dict ? dict.translit : '', ipa: dict ? dict.ipa : '', root: dict ? dict.root : '',
       sentence: st.sentence === st.word ? '' : st.sentence, sentenceTr: pe ? pe.other : mt, sentenceSrc: pe ? 'book' : (mt ? 'ai' : ''),
@@ -5082,39 +5321,26 @@ function entryOf(st) {
     const tr = pe ? pe.other : (st.s.st === 'ok' ? st.s.v.translation : '');
     if (!tr) return null;
     return {
-      id: 'w' + hash2(['sent', st.sentTarget, normKey(st.sentence)].join('|')), kind: 'sentence', src: tagOf(st.sentLang), target: st.sentTarget,
+      id: 'w' + hash2(['sent', st.sentTarget, normKey(st.sentence), bid].join('|')), dk: 'w' + hash2(['sent', st.sentTarget, normKey(st.sentence)].join('|')), bookId: bid, kind: 'sentence', src: tagOf(st.sentLang), target: st.sentTarget,
       surface: '', translations: [], sentence: st.sentence, sentenceTr: tr, sentenceSrc: pe ? 'book' : 'ai', book, createdAt: Date.now()
     };
   }
   return null;
 }
-function refreshSave() {
-  const b = $('#sv'); if (!b || !S) return;
-  const en = entryOf(S), on = !!en && Coll.has(en.id);
-  b.disabled = !en; b.setAttribute('aria-pressed', String(on));
-  b.innerHTML = (on ? ICON.check : ICON.plus) + '<span>' + (on ? 'Сохранено' : (S.kind === 'sentence' ? 'Сохранить фразу' : 'Сохранить слово')) + '</span>';
-}
+/* the star: this book's collection; the bookmark: the notes */
 async function toggleSave() {
-  const en = entryOf(S); if (!en) return;
+  const st = S; if (!st) return;
   try {
-    if (Coll.has(en.id)) { await Coll.remove(en.id); toast('Убрано из коллекции'); }
-    else { await Coll.save(en); toast('Сохранено в коллекцию'); }
+    const old = st.kind === 'word' ? savedWord(st) : (() => { const e = entryOf(st); return e && Coll.has(e.id) ? e : null; })();
+    if (old) { await Coll.remove(old.id); toast('Убрано из коллекции'); }
+    else { const en = entryOf(st); if (!en) return; await Coll.save(en); toast('Добавлено в коллекцию этой книги'); }
   } catch { toast('Не удалось сохранить, попробуй ещё раз'); }
-  refreshSave();
 }
-function copyPayload(st) {
-  const lines = [];
-  const pf = st.pair && st.p.st === 'ok' && st.p.v.found ? st.p.v : null, pe = st.pair ? pairEx(st) : null;
-  const mt = st.s.st === 'ok' ? st.s.v.translation : '';
-  if (st.kind === 'word') {
-    const v = st.w.st === 'ok' ? st.w.v : null;
-    const tr = [pf && pf.phrase, ...(v ? v.translations : [])].filter(Boolean);
-    lines.push(tr.length ? `${st.word} — ${[...new Set(tr)].join(', ')}` : st.word);
-    if (st.sentence && st.sentence !== st.word) { lines.push('', st.sentence); if (pe) lines.push(pe.other); else if (mt) lines.push(mt); }
-  } else {
-    lines.push(st.sentence); if (pe) lines.push('', pe.other); else if (mt) lines.push('', mt);
-  }
-  return lines.join('\n');
+function toggleMark(st) {
+  const dict = st.w && st.w.st === 'ok' ? st.w.v.translations[0] : '', pf = st.pair && st.p.st === 'ok' && st.p.v.found ? st.p.v.phrase : '';
+  const ex = pairEx(st), mt = st.s && st.s.st === 'ok' ? st.s.v.translation : '';
+  const tr = st.kind === 'word' ? [dict, pf].filter(Boolean).join(' · ') : (ex && ex.other) || mt;
+  return toggleNote({ kind: noteKind(st), text: st.kind === 'word' ? st.word : st.sentence, sentence: st.sentence, tr, range: st.range });
 }
 sheetEl.addEventListener('click', async e => {
   const b = e.target.closest ? e.target.closest('[data-act]') : null;
@@ -5124,18 +5350,13 @@ sheetEl.addEventListener('click', async e => {
   else if (act === 'engine') openEngine();
   else if (act === 'speak-w') speak(st.word, st.lang);
   else if (act === 'speak-s') speak(st.sentence, st.sentLang);
-  else if (act === 'copy') toast(await copyText(copyPayload(st)) ? 'Скопировано' : 'Не удалось скопировать');
   else if (act === 'save') toggleSave();
+  else if (act === 'mark') toggleMark(st);
+  else if (act === 'unit') { st.unit = b.dataset.v; paint(); pickHighlights(st); }
+  else if (act === 'note') pickNote(st);
+  else if (act === 'tr') pickTranslate(st);
   else if (act === 'mt') { if (canMT(st) && st.s.st === 'none') { runPart(st, 's'); paint(); } }
-  else if (act === 'target') {
-    if (P.latinTarget === b.dataset.v) return;
-    P.latinTarget = b.dataset.v; savePrefs();
-    st.ctl.abort(); st.ctl = new AbortController();
-    targetsFor(st);
-    if (st.kind === 'word') runPart(st, 'w');
-    if (st.s.st !== 'none') runPart(st, 's');
-    paint();
-  } else if (act === 'retry') {
+  else if (act === 'retry') {
     const parts = b.dataset.part === 'all' ? ['w', 's', 'p'] : [b.dataset.part];
     for (const p of parts) { if (p === 'p') { if (st.p.st !== 'loading') runP(st); } else if (st[p].st === 'err') runPart(st, p); }
     paint();
@@ -5149,18 +5370,39 @@ if (window.ResizeObserver) {
     if (S && S.range && sheetOpen() && !side) ensureVisible(S.range);
   }).observe(sheetEl);
 }
-Coll.subs.add(() => { refreshSave(); if (!views.coll.hidden) renderColl(); });
+Coll.subs.add(() => { if (S && sheetOpen()) paint(); if (!views.coll.hidden) renderColl(); });
+Notes.subs.add(() => { if (S && sheetOpen()) paint(); if (!views.notes.hidden) renderNotes(); if (!views.coll.hidden) renderColl(); });
 
 /* ---------- collection view and Anki export ---------- */
 function fmtDate(ts) { try { return new Date(ts).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', year: 'numeric' }); } catch { return ''; } }
+/* every book has its own collection and its own notes: the chips above the list pick a book */
+const CF = { book: '', nbook: '' };
+const slugOf = t => String(t || '').replace(/[^\p{L}\p{N}]+/gu, '_').replace(/^_+|_+$/g, '').slice(0, 40);
+const grpKey = e => bookKeyOf(e) || '-';
+function groupsOf(list) {
+  const m = new Map();
+  for (const e of list) {
+    const k = grpKey(e), g = m.get(k) || { key: k, label: e.book || 'Без книги', n: 0, t: 0 };
+    g.n++; g.t = Math.max(g.t, e.createdAt || 0); m.set(k, g);
+  }
+  return [...m.values()].sort((a, b) => b.t - a.t);
+}
+function chipsHtml(groups, cur, total) {
+  if (groups.length < 2) return '';
+  return `<button type="button" class="chip" data-bk="" aria-pressed="${cur === ''}">Все <small>${total}</small></button>`
+    + groups.map(g => `<button type="button" class="chip" data-bk="${esc(g.key)}" aria-pressed="${cur === g.key}">${esc(cut(g.label, 26))} <small>${g.n}</small></button>`).join('');
+}
 function renderColl() {
-  const all = Coll.all();
-  $('#c-count').textContent = all.length ? '· ' + all.length : '';
+  const all = Coll.all(), groups = groupsOf(all);
+  if (CF.book && !groups.some(g => g.key === CF.book)) CF.book = '';
+  const inBk = CF.book ? all.filter(e => grpKey(e) === CF.book) : all;
+  $('#c-count').textContent = all.length ? '· ' + inBk.length : '';
+  const bk = $('#c-books'); bk.innerHTML = chipsHtml(groups, CF.book, all.length); bk.hidden = groups.length < 2;
+  const nn = Notes.all().length; $('#c-notes-n').textContent = nn ? nn + ' ' + stPl(nn, ['закладка', 'закладки', 'закладок']) : '';
   const q = normKey($('#c-q').value);
-  const list = q ? all.filter(e => normKey([e.surface, e.lemma, e.bookPhrase, e.sentence, e.sentenceTr, (e.translations || []).join(' '), e.book].join(' ')).includes(q)) : all;
-    + (Coll.remote ? '' : (IN_CLAUDE ? '<br><b>Общее хранилище недоступно:</b> слова хранятся только в этом браузере.' : '<br>Слова хранятся в этом браузере. Если очистить данные сайта, они пропадут, поэтому иногда делай экспорт.'));
+  const list = q ? inBk.filter(e => normKey([e.surface, e.lemma, e.bookPhrase, e.sentence, e.sentenceTr, (e.translations || []).join(' '), e.book].join(' ')).includes(q)) : inBk;
   $('#c-list').innerHTML = list.length ? list.map(cardHtml).join('')
-    : `<div class="empty">${all.length ? 'Ничего не найдено.' : 'Пока пусто. Нажми на слово в книге и выбери «Сохранить слово».'}</div>`;
+    : `<div class="empty">${all.length ? 'Ничего не найдено.' : 'Пока пусто. Нажми ★ у слова в книге.'}</div>`;
 }
 function cardHtml(e) {
   const isW = e.kind !== 'sentence';
@@ -5206,13 +5448,20 @@ function ankiRow(e) {
       + (e.form ? `<div style="color:#888">${esc(e.form)}</div>` : '')
       + sentBack;
   }
-  const slug = String(e.book || '').replace(/[^\p{L}\p{N}]+/gu, '_').replace(/^_+|_+$/g, '').slice(0, 40);
+  const slug = slugOf(e.book);
   const tags = ['chitalka', e.src || 'en', slug].filter(Boolean).join(' ');
   return [qv(front), qv(back), qv(tags)].join('\t');
 }
 function ankiTsv(list) {
   const rows = [...list].sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0)).map(ankiRow);
   return ['#separator:tab', '#html:true', '#tags column:3', ...rows].join('\n') + '\n';
+}
+/* what goes to Anki: the chosen book's words, or every book's (a word kept in several books is exported once) */
+function collExportList() {
+  const all = Coll.all();
+  if (CF.book) return all.filter(e => grpKey(e) === CF.book);
+  const seen = new Set();
+  return [...all].sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0)).filter(e => { const k = e.dk || e.id; if (seen.has(k)) return false; seen.add(k); return true; });
 }
 function saveFile(filename, text) {
   const url = URL.createObjectURL(new Blob([text], { type: 'text/plain;charset=utf-8' }));
@@ -5221,11 +5470,12 @@ function saveFile(filename, text) {
   setTimeout(() => URL.revokeObjectURL(url), 4000);
 }
 $('#c-export').addEventListener('click', async () => {
-  const list = Coll.all();
+  const list = collExportList();
   if (!list.length) return toast('В коллекции пока пусто');
   const tsv = ankiTsv(list);
   const d = new Date(), p2 = n => String(n).padStart(2, '0');
-  const filename = `chitalka-anki-${d.getFullYear()}-${p2(d.getMonth() + 1)}-${p2(d.getDate())}.txt`;
+  const bkName = CF.book && list[0] ? slugOf(list[0].book) : '';
+  const filename = `chitalka-anki-${bkName ? bkName + '-' : ''}${d.getFullYear()}-${p2(d.getMonth() + 1)}-${p2(d.getDate())}.txt`;
   if (!cap.downloads) {
     if (!IN_CLAUDE) { try { saveFile(filename, tsv); return toast('Файл для Anki сохранён в загрузки', 4000); } catch { /* fall through to copy */ } }
     return toast(await copyText(tsv) ? 'Сохранение файлов недоступно. Текст скопирован: вставь его в файл .txt' : 'Сохранение файлов здесь недоступно', 5000);
@@ -5237,38 +5487,81 @@ $('#c-export').addEventListener('click', async () => {
   }
 });
 $('#c-copy').addEventListener('click', async () => {
-  const list = Coll.all();
+  const list = collExportList();
   if (!list.length) return toast('В коллекции пока пусто');
   toast(await copyText(ankiTsv(list)) ? 'Скопировано: вставь в файл .txt и импортируй в Anki' : 'Не удалось скопировать', 4000);
 });
 
+
+/* ---------- notes: the bookmarks, on a page of their own inside the collection ---------- */
+function noteCardHtml(n) {
+  const isW = n.kind === 'word', ar = detectLang(n.text) === 'ar', trAr = detectLang(n.tr || '') === 'ar';
+  const body = isW
+    ? `<div class="card-top"><span class="card-w${ar ? ' ar' : ''}"${dirAttr(n.text)}>${esc(n.text)}</span>${n.tr ? `<span class="card-t${trAr ? ' ar' : ''}" dir="${trAr ? 'rtl' : 'auto'}">${esc(n.tr)}</span>` : ''}</div>${n.sentence ? `<div class="card-s"${dirAttr(n.sentence)}>${boldIn(n.sentence, n.text, -1)}</div>` : ''}`
+    : `<div class="card-n${ar ? ' ar' : ''}"${dirAttr(n.text)}>${esc(n.text)}</div>${n.tr ? `<div class="card-s${trAr ? ' ar' : ''}" dir="${trAr ? 'rtl' : 'auto'}">${esc(n.tr)}</div>` : ''}`;
+  return `<div class="card note" data-id="${esc(n.id)}">${body}<div class="card-m"><span>${esc([n.book, fmtDate(n.createdAt)].filter(Boolean).join(' · '))}${n.pending ? ' · ждёт синхронизации' : ''}</span><span class="card-b"><button class="del" data-ncopy="${esc(n.id)}">Копировать</button><button class="del" data-ndel="${esc(n.id)}">Удалить</button></span></div></div>`;
+}
+const noteText = n => (n.kind === 'word' ? n.text + (n.tr ? ' — ' + n.tr : '') + (n.sentence ? '\n' + n.sentence : '') : n.text + (n.tr ? '\n' + n.tr : ''));
+function notesShown() {
+  const all = Notes.all(), groups = groupsOf(all);
+  if (CF.nbook && !groups.some(g => g.key === CF.nbook)) CF.nbook = '';
+  const inBk = CF.nbook ? all.filter(e => grpKey(e) === CF.nbook) : all;
+  const q = normKey($('#n-q').value);
+  return { all, groups, inBk, list: q ? inBk.filter(n => normKey([n.text, n.tr, n.sentence, n.book].join(' ')).includes(q)) : inBk };
+}
+function renderNotes() {
+  const { all, groups, inBk, list } = notesShown();
+  $('#n-count').textContent = all.length ? '· ' + inBk.length : '';
+  const bk = $('#n-books'); bk.innerHTML = chipsHtml(groups, CF.nbook, all.length); bk.hidden = groups.length < 2;
+  $('#n-list').innerHTML = list.length ? list.map(noteCardHtml).join('')
+    : `<div class="empty">${all.length ? 'Ничего не найдено.' : 'Пока пусто. Нажми закладку у слова или удержи слово в тексте.'}</div>`;
+}
+const nDelTimers = new Map();
+$('#n-list').addEventListener('click', async ev => {
+  const c = ev.target.closest ? ev.target.closest('[data-ncopy]') : null;
+  if (c) { const n = Notes.get(c.getAttribute('data-ncopy')); if (n) toast(await copyText(noteText(n)) ? 'Скопировано' : 'Не удалось скопировать'); return; }
+  const b = ev.target.closest ? ev.target.closest('[data-ndel]') : null; if (!b) return;
+  const id = b.getAttribute('data-ndel');
+  if (!b.classList.contains('sure')) {
+    b.classList.add('sure'); b.textContent = 'Точно удалить?';
+    clearTimeout(nDelTimers.get(id)); nDelTimers.set(id, setTimeout(() => { b.classList.remove('sure'); b.textContent = 'Удалить'; }, 3500));
+    return;
+  }
+  try { await Notes.remove(id); toast('Удалено'); } catch { toast('Не удалось удалить'); }
+});
+$('#n-q').addEventListener('input', debounce(renderNotes, 120));
+$('#n-books').addEventListener('click', e => { const b = e.target.closest('[data-bk]'); if (b) { CF.nbook = b.dataset.bk; renderNotes(); } });
+$('#c-books').addEventListener('click', e => { const b = e.target.closest('[data-bk]'); if (b) { CF.book = b.dataset.bk; renderColl(); } });
+$('#n-copy').addEventListener('click', async () => {
+  const { list } = notesShown();
+  if (!list.length) return toast('В заметках пока пусто');
+  toast(await copyText(list.map(noteText).join('\n\n')) ? 'Скопировано' : 'Не удалось скопировать');
+});
+function openNotes() { renderNotes(); show('notes'); NAV.push('notes', () => show('coll')); }
+
 /* ---------- start ---------- */
 function openColl() { renderColl(); show('coll'); NAV.push('coll', () => show('lib')); }
-function engineBanner() {
-  if (IN_CLAUDE) return '';
-  if (!engineReady()) return '<div class="help warn"><span>Чтобы переводить, подключи модель: ключ API и название модели.</span> <button class="btn btn-soft" data-engine-open>Подключить</button></div>';
-  return `<div class="help"><span>Перевод: ${esc(engineSummary())}</span> <button class="btn btn-soft" data-engine-open>Сменить</button></div>`;
-}
 function init() {
-  Coll.init(); applyPrefs();
-  $('#b-back').innerHTML = ICON.back; $('#b-coll-back').innerHTML = ICON.back;
+  Coll.init(); Notes.init(); applyPrefs();
+  $('#b-back').innerHTML = ICON.back; $('#b-coll-back').innerHTML = ICON.back; $('#b-notes-back').innerHTML = ICON.back; $('#c-notes-i').innerHTML = ICON.mark;
   $('#b-lang').addEventListener('click', switchLang); $('#b-toc').innerHTML = ICON.toc; $('#b-par').innerHTML = ICON.par; $('#b-coll-lib').innerHTML = ICON.coll; $('#b-set-lib').innerHTML = ICON.gear;
-  $('#b-theme').addEventListener('click', toggleTheme); $('#b-theme2').addEventListener('click', toggleTheme);
+  $('#b-theme').addEventListener('click', toggleTheme); $('#b-theme2').addEventListener('click', toggleTheme); $('#b-theme4').addEventListener('click', toggleTheme);
   $('#b-set-lib').addEventListener('click', openSettings);
-  $('#lib-eng').addEventListener('click', e => { if (e.target.closest('[data-engine-open]')) openEngine(); });
   if (darkMQ.addEventListener) darkMQ.addEventListener('change', applyPrefs);
   $('#b-coll-lib').addEventListener('click', openColl);
   $('#b-coll-back').addEventListener('click', () => { if (!NAV.pop('coll')) show('lib'); });
+  $('#b-notes-back').addEventListener('click', () => { if (!NAV.pop('notes')) show('coll'); });
+  $('#c-notes').addEventListener('click', openNotes);
   renderLibrary(); stInit(); bindTour(); maybeTour();
   if (IN_CLAUDE) {
     const c = window.claude;
     c.use('sample').then(s => { cap.sample = s || null; if (!s) toast('Перевод доступен только на странице, открытой через Claude', 5000); }).catch(() => {});
-    c.use('db').then(d => { if (d) { Coll.attach(d); } }).catch(() => {});
+    c.use('db').then(d => { if (d) { Coll.attach(d); Notes.attach(d); } }).catch(() => {});
     c.use('downloads').then(d => { cap.downloads = d || null; }).catch(() => {});
   }
 }
 init();
-if (window.__RD_TEST) window.__rd = { idb, gotoPageNo, pairSwitch, coverFor, thumbOf, backfillCovers, anchorKnots, chapterGroups, learnLexicon, alignGlobal, alignSeq, chapterPlan, buildAnchors, alignBooks, mmWord, mmSentence, mmChunks, ggWord, ggSentence, ggCall, mtWord, mtSentence, dictWord, dictForms, dictParse, dictImport, dictClear, dictLoad, dictSenses, parseTable, parseStarDict, errCopy, eng, findInBook, jumpToHit, tocCurrent, wakeState: () => !!wakeLock, wakeSync, FIND, R, BI, setParallel, exportAligned, anchorNow, restoreAnchor, goSpread, turn, relayoutKeep, pageState, setChrome, gotoChapter, pairLocate, sentencesOf, buildIndex, pxFrom, alignBooks, ensurePair, windowAt, extractFlat, alignSeq, bookLang, parseBook, importFile, P, API, Keys, eng, S: () => S };
+if (window.__RD_TEST) window.__rd = { Coll, Notes, CF, collKeys, savedEntry, collExportList, openNotes, idb, gotoPageNo, pairSwitch, coverFor, thumbOf, backfillCovers, anchorKnots, chapterGroups, learnLexicon, alignGlobal, alignSeq, chapterPlan, buildAnchors, alignBooks, mmWord, mmSentence, mmChunks, ggWord, ggSentence, ggCall, mtWord, mtSentence, dictWord, dictForms, dictParse, dictImport, dictClear, dictLoad, dictSenses, parseTable, parseStarDict, errCopy, eng, findInBook, jumpToHit, tocCurrent, wakeState: () => !!wakeLock, wakeSync, FIND, R, BI, setParallel, exportAligned, anchorNow, restoreAnchor, goSpread, turn, relayoutKeep, pageState, setChrome, gotoChapter, pairLocate, sentencesOf, buildIndex, pxFrom, alignBooks, ensurePair, windowAt, extractFlat, alignSeq, bookLang, parseBook, importFile, P, API, Keys, eng, S: () => S };
 })();
 </script>
 

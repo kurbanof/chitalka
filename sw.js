@@ -1,8 +1,8 @@
 /* Читалка-переводчик: сервис-воркер. Оболочка приложения лежит в кеше, поэтому книги читаются без интернета. */
-const VER = 'rd-7bc3a06899';
-const SHELL = ['./', 'index.html', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'maskable-512.png', 'apple-touch-icon.png', 'icon.svg'];
+const VER = 'rd-b48825bce3';
+const SHELL = ['./', 'index.html', 'manifest.json', 'icon-192.png', 'icon-512.png', 'maskable-512.png', 'apple-touch-icon.png', 'icon.svg'];
 const FONTS = /^https:\/\/fonts\.(googleapis|gstatic)\.com\//;
-self.addEventListener('install', e => { e.waitUntil(caches.open(VER).then(c => c.addAll(SHELL)).then(() => self.skipWaiting())); });
+self.addEventListener('install', e => { e.waitUntil(caches.open(VER).then(c => Promise.all(SHELL.map(u => c.add(u).catch(() => null)))).then(() => self.skipWaiting())); });
 self.addEventListener('activate', e => {
   e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k.startsWith('rd-') && k !== VER && k !== 'rd-fonts').map(k => caches.delete(k)))).then(() => self.clients.claim()));
 });
