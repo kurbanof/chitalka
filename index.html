@@ -198,6 +198,7 @@ body.in-reader #app { padding-bottom: 0; }
 .book p:has(+ .par-tr) { margin-bottom: .35em; }
 ::highlight(rd-sent) { background-color: var(--hl-s); }
 ::highlight(rd-find) { background-color: var(--hl-w); text-decoration: underline; text-decoration-color: var(--accent); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.find-on { background-color: var(--hl-w); border-radius: 4px; }
 .find-flash { animation: find-flash 2.4s ease-out; }
 @keyframes find-flash { 0%, 60% { background-color: var(--hl-w); } 100% { background-color: transparent; } }
 ::highlight(rd-word) { background-color: var(--hl-w); text-decoration: underline; text-decoration-color: var(--accent); text-decoration-thickness: 2px; text-underline-offset: 3px; }
@@ -288,6 +289,11 @@ body.in-reader #app { padding-bottom: 0; }
   border: 1px solid var(--glass-border); border-radius: 30px; box-shadow: 0 -4px 40px var(--shade), inset 0 1px 0 var(--hl); padding: 14px 20px 20px; }
 .scrim.clear .panel { max-height: 66vh; }
 .panel h2 { margin: 6px 0 8px; font: 800 19px var(--font-ui); letter-spacing: -.01em; display: flex; justify-content: space-between; align-items: center; }
+/* the title row with the close button stays where it is while the rest of a window scrolls */
+.panel > h2:first-child { position: sticky; top: -14px; z-index: 6; margin: -14px -20px 6px; padding: 18px 20px 8px; background: var(--paper); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); }
+.panel > h2:first-child::after { content: ""; position: absolute; left: 0; right: 0; top: 100%; height: 12px; background: linear-gradient(var(--paper), transparent); pointer-events: none; }
+.sheet-in > .sh-top, .sheet-in > .sh-head { position: sticky; top: -8px; z-index: 6; margin: -8px -20px 0; padding: 8px 20px 0; background: var(--paper); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); }
+.sheet-in > .sh-top::after, .sheet-in > .sh-head::after { content: ""; position: absolute; left: 0; right: 0; top: 100%; height: 12px; background: linear-gradient(var(--paper), transparent); pointer-events: none; }
 .panel h3 { margin: 16px 0 2px; font: 800 11px/1.2 var(--font-ui); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
 .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line); min-height: 56px; }
 .row:first-of-type, h2 + .row, h3 + .row { border-top: 0; }
@@ -322,6 +328,12 @@ body.in-reader #app { padding-bottom: 0; }
 .toc-hit small { display: block; margin-bottom: 4px; font: 800 10.5px/1.2 var(--font-ui); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
 .toc-hit span { display: block; font: 500 14.5px/1.45 var(--font-ui); color: var(--ink-2); overflow-wrap: anywhere; }
 .toc-hit mark { background: var(--hl-w); color: var(--ink); border-radius: 4px; padding: 0 1px; }
+.toc-hit.cur { background: var(--chip); box-shadow: inset 3px 0 0 var(--accent); }
+/* floating find bar */
+.fbar { position: fixed; z-index: 26; left: 0; right: 0; margin-inline: auto; width: fit-content; max-width: calc(100% - 24px); bottom: calc(env(safe-area-inset-bottom, 0px) + var(--fb, 14px)); display: flex; align-items: center; gap: 0; padding: 4px 6px; border-radius: 999px; background: var(--paper); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); box-shadow: 0 6px 20px var(--shade); transition: bottom .28s cubic-bezier(.2, .8, .2, 1); }
+.fbar[hidden] { display: none; }
+.fbar .f-cnt { min-width: 5.4em; padding: 0 6px; text-align: center; font: 700 13px var(--font-ui); color: var(--ink-2); white-space: nowrap; font-variant-numeric: tabular-nums; }
+@media (max-width: 380px) { .rtop .icon-btn { width: 40px; } }
 .toc-cnt { margin: 6px 6px 4px; font: 700 12px var(--font-ui); color: var(--ink-3); }
 .toc-i:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 
@@ -455,9 +467,6 @@ body.boot .lib-hero, body.boot .sec-h, body.boot .book-card, body.boot .empty { 
 }
 
 /* library: two actions, then books; a pair of books is one row with a language switch */
-.lib-actions { display: flex; gap: 10px; margin-top: 14px; }
-.lib-actions .btn { flex: 1; min-width: 0; min-height: 54px; font-size: 14.5px; white-space: nowrap; gap: 8px; padding-inline: 10px; }
-.lib-actions .btn svg.i { width: 20px; height: 20px; }
 .pair-card { flex-wrap: wrap; row-gap: 0; }
 .pair-card .mono { width: 44px; height: 58px; font-size: 22px; }
 .pair-card .book-meta { flex: 1; }
@@ -560,15 +569,18 @@ body.boot .lib-hero, body.boot .sec-h, body.boot .book-card, body.boot .empty { 
 /* wide screen + parallel text: the text on the left, its translation on the right */
 .book .par-tr { white-space: pre-line; }
 #v-reader.sbs:not(.paged) #pager { max-width: min(70rem, 100%); }
-.book.sbs .pg { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: clamp(22px, 4vw, 44px); align-items: start; }
-.book.sbs .pg > * { grid-column: 1; }
-.book.sbs .pg > .wide { grid-column: 1 / -1; width: 100%; max-width: 40em; justify-self: center; }
-.book.sbs .pg > .par-tr.g { grid-column: 2; grid-row: var(--r) / span var(--n); }
-.book.sbs .pg > .par-tr:not(.g) { grid-column: 1 / -1; }
-.book.sbs .pg > p:has(+ .par-tr) { margin-bottom: var(--pm); }
-.book.sbs .par-tr.g { margin: 0 0 var(--pm); padding: 0 0 0 .8em; border-radius: 0; background: none; border-inline-start: 2px solid var(--c3); color: var(--ink-2);
-  font-family: var(--font-read); font-size: 1em; line-height: var(--lh); font-weight: var(--fw); text-align: start; break-inside: auto; }
-.book.sbs .par-tr.g.ar { font-size: 1.1em; line-height: calc(var(--lh) + .35); }
+.book.sbs { --sg: clamp(22px, 4vw, 44px); }
+.book.sbs .brow { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: var(--sg); align-items: start; margin: 0 0 var(--pm); break-inside: avoid; }
+.book.sbs .brow > .bl, .book.sbs .brow > .br { min-width: 0; }
+.book.sbs .bl > :first-child { margin-top: 0; }
+.book.sbs .brow:has(> .bl > :is(h1, h2, h3, h4, h5, h6):first-child) { margin-top: 1.4em; }
+.book.sbs .brow > .br { border-inline-start: 2px solid var(--c3); padding-inline-start: .8em; }
+.book.sbs .br > .par-tr { margin: 0; padding: 0; border-radius: 0; background: none; border: 0; color: var(--ink-2); font-family: var(--font-read); font-size: 1em; line-height: var(--lh);
+  font-weight: var(--fw); text-align: var(--align); hyphens: var(--hyph); break-inside: auto; }
+.book.sbs .br > .par-tr + .par-tr { margin-top: var(--pm); }
+.book.sbs .br > .par-tr.ar { font-size: 1.1em; line-height: calc(var(--lh) + .35); }
+/* what has no translation keeps to the left half, so the two columns stay the same all the way down */
+.book.sbs :is(p, h1, h2, h3, h4, h5, h6, ul:not(:has(.brow)), ol:not(:has(.brow)), blockquote, table, figure, pre, aside.par-tr):not(:where(.bl, .br, ul, ol, blockquote, table, figure, li, td) *) { max-width: calc((100% - var(--sg)) / 2); }
 /* short landscape screens: the translation sheet becomes a side panel on the side away from the word, so the text stays readable */
 @media (orientation: landscape) and (max-height: 520px) and (min-width: 640px) {
   .sheet.side { left: auto; right: max(10px, env(safe-area-inset-right, 0px)); margin-inline: 0; max-width: none; width: min(42vw, 25rem);
@@ -609,7 +621,6 @@ body.boot .lib-hero, body.boot .sec-h, body.boot .book-card, body.boot .empty { 
 .pair-card > .del.more { position: absolute; right: 8px; top: 8px; min-height: 36px; padding: 0 10px; font-size: 18px; }
 .pair-card .pair-del { flex-basis: 100%; }
 
-@media (max-width: 350px) { .lib-actions .btn { font-size: 13px; gap: 6px; padding-inline: 8px; } .lib-actions .btn svg.i { width: 18px; height: 18px; } }
 .fld input.vh { width: 1px; min-height: 0; height: 1px; padding: 0; border: 0; }
 .seg.s4 { display: flex; }
 .seg.s4 button { flex: 1 1 auto; padding: 0 9px; font-size: 12.5px; }
@@ -721,6 +732,41 @@ body.boot .lib-hero, body.boot .sec-h, body.boot .book-card, body.boot .empty { 
 .goal-ic { animation: goal-badge .6s .12s cubic-bezier(.2, 1.3, .4, 1) both; }
 .goal.out .goal-in { animation: goal-out .25s ease-in both; }
 @media (prefers-reduced-motion: reduce) { .goal-in, .goal-ic, .goal-c i, .st-bar i { animation: none !important; transition: none !important; } .goal-c { display: none; } }
+
+/* ---------- the add-book button, the three main screens' markers ---------- */
+.fab-wrap { position: fixed; z-index: 14; right: max(16px, env(safe-area-inset-right, 0px)); bottom: calc(env(safe-area-inset-bottom, 0px) + 60px); display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+.fab-wrap[hidden], .fab-menu[hidden], .pdots[hidden], .fab-scrim[hidden] { display: none; }
+.fab-scrim { position: fixed; inset: 0; z-index: 13; background: color-mix(in srgb, var(--scrim) 60%, transparent); animation: fade-in .2s ease-out both; }
+.fab { min-height: 56px; padding: 0 22px 0 16px; border-radius: 999px; border: 0; background: var(--accent); color: var(--on-accent); font: 800 15px var(--font-ui); display: inline-flex; align-items: center; gap: 8px; cursor: pointer;
+  box-shadow: 0 10px 26px var(--shade), inset 0 1px 0 rgba(255, 255, 255, .28); transition: padding .25s, gap .25s; }
+.fab svg.i { width: 24px; height: 24px; transition: transform .25s; }
+.fab span { max-width: 8em; overflow: hidden; white-space: nowrap; transition: max-width .25s, opacity .2s; }
+.fab-wrap.mini .fab { padding: 0 16px; gap: 0; }
+.fab-wrap.mini .fab span { max-width: 0; opacity: 0; }
+.fab-wrap.open .fab svg { transform: rotate(45deg); }
+.fab:focus-visible, .fab-item:focus-visible, .pdots button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.fab-menu { display: flex; flex-direction: column; padding: 6px; border-radius: 26px; min-width: min(17rem, calc(100vw - 32px)); animation: pop-in .26s cubic-bezier(.2, .8, .2, 1) both; transform-origin: 100% 100%; }
+.fab-item { all: unset; box-sizing: border-box; display: flex; align-items: center; gap: 14px; min-height: 58px; padding: 8px 16px; border-radius: 20px; cursor: pointer; }
+.fab-item:hover, .fab-item:active { background: var(--chip); }
+.fab-item:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.fab-item svg.i { width: 22px; height: 22px; flex: none; color: var(--accent); }
+.fab-item b { display: block; font: 800 15px var(--font-ui); color: var(--ink); }
+.fab-item small { display: block; margin-top: 2px; font: 500 12.5px var(--font-ui); color: var(--ink-3); }
+.lib-empty { margin: 14px 0 0; padding: 16px 18px; border-radius: 22px; background: var(--glass-strong); border: 1px dashed var(--line-strong); }
+.lib-empty b { display: block; font: 800 15px var(--font-ui); margin-bottom: 4px; }
+.lib-empty span { display: block; font: 500 14px/1.45 var(--font-ui); color: var(--ink-2); }
+#v-lib .wrap { padding-bottom: 140px; }
+#v-coll, #v-stats, #v-notes { padding-bottom: 70px; }
+.pdots { position: fixed; z-index: 14; left: 0; right: 0; margin-inline: auto; width: fit-content; height: 28px; bottom: calc(env(safe-area-inset-bottom, 0px) + 14px); display: flex; align-items: center; padding: 0 4px; border-radius: 999px; background: var(--sheen), var(--bar-bg); box-shadow: 0 4px 14px var(--shade); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); }
+.pdots button { all: unset; box-sizing: border-box; width: 30px; height: 44px; margin: -8px 0; display: grid; place-items: center; cursor: pointer; border-radius: 999px; }
+.pdots i { width: 7px; height: 7px; border-radius: 99px; background: var(--ink-3); opacity: .6; transition: width .25s, opacity .25s, background .25s; }
+.pdots button[aria-selected=true] i { width: 20px; background: var(--accent); opacity: 1; }
+#v-lib, #v-coll, #v-stats, #v-notes { touch-action: pan-y pinch-zoom; }
+#c-books, #n-books { touch-action: pan-x pan-y; }
+@keyframes v-in-l { from { opacity: 0; transform: translateX(-8%); } to { opacity: 1; transform: none; } }
+body[data-tab="b"] .v-enter { animation-name: v-in-l; }
+#v-coll.v-enter, #v-stats.v-enter, #v-notes.v-enter { z-index: 13; }
+@media (prefers-reduced-motion: reduce) { .fab, .fab svg.i, .fab span, .pdots i, .fab-menu { transition: none !important; animation: none !important; } }
 </style>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
@@ -744,10 +790,6 @@ body.boot .lib-hero, body.boot .sec-h, body.boot .book-card, body.boot .empty { 
       <button class="icon-btn" id="b-set-lib" aria-label="Настройки и движок перевода"></button>
     </header>
     <div class="wrap">
-      <div class="lib-actions">
-        <label class="btn btn-primary" for="file" id="open-lbl"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Открыть книгу</label>
-        <label class="btn btn-soft" for="file-pair" id="open-pair-lbl"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h6a2 2 0 0 1 2 2v12a2 2 0 0 0-2-2H4zM20 5h-6a2 2 0 0 0-2 2v12a2 2 0 0 1 2-2h6z"/></svg>Две книги</label>
-      </div>
       <div id="lib-builtin"></div>
       <div id="lib-books"></div>
       <h2 class="sec-h">Примеры</h2>
@@ -768,13 +810,21 @@ body.boot .lib-hero, body.boot .sec-h, body.boot .book-card, body.boot .empty { 
       <div class="ttl"><b id="r-title"></b><span id="r-sub"></span></div>
       <button class="icon-btn" id="b-lang" aria-label="Читать на другом языке" hidden><span class="aa" id="b-lang-t">RU</span></button>
       <button class="icon-btn" id="b-par" aria-label="Параллельный текст из второй книги" aria-pressed="false" hidden></button>
-      <button class="icon-btn" id="b-toc" aria-label="Оглавление и поиск"></button>
+      <button class="icon-btn" id="b-find" aria-label="Поиск по книге" hidden></button>
+      <button class="icon-btn" id="b-toc" aria-label="Оглавление"></button>
       <button class="icon-btn" id="b-aa" aria-label="Шрифт и настройки"><span class="aa">Aa</span></button>
     </header>
     <footer class="rbar rbot glass" id="r-bot">
       <div class="pb-row"><button class="pb-info" id="pb-info" aria-label="Страницы или проценты: нажми, чтобы переключить"><span id="pb-l"></span></button><label class="pb-go" id="pb-go"><span>К странице</span><input id="pb-n" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="go" aria-label="Перейти на страницу: введи номер и нажми «Готово»"></label></div>
       <div class="pb-track" id="pb-track" role="slider" tabindex="0" aria-label="Положение в книге" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i class="pb-fill" id="pb-fill"></i><b class="pb-thumb" id="pb-thumb"></b></div>
     </footer>
+    <div class="fbar glass" id="fbar" role="toolbar" aria-label="Результаты поиска" hidden>
+      <button class="icon-btn" id="f-list" aria-label="Список результатов"></button>
+      <button class="icon-btn" id="f-prev" aria-label="Предыдущее совпадение"></button>
+      <span class="f-cnt" id="f-cnt" role="status" aria-live="polite"></span>
+      <button class="icon-btn" id="f-next" aria-label="Следующее совпадение"></button>
+      <button class="icon-btn" id="f-x" aria-label="Закрыть поиск"></button>
+    </div>
   </section>
 
   <section id="v-coll" hidden>
@@ -821,6 +871,20 @@ body.boot .lib-hero, body.boot .sec-h, body.boot .book-card, body.boot .empty { 
   </section>
 </div>
 
+<div class="fab-scrim" id="fab-scrim" hidden></div>
+<div class="fab-wrap" id="fab-wrap" hidden>
+  <div class="fab-menu glass" id="fab-menu" role="menu" aria-label="Добавить книгу" hidden>
+    <button class="fab-item" role="menuitem" data-add="one"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10a1 1 0 011 1v15l-6-4-6 4V5a1 1 0 011-1z"/></svg><span><b>Одна книга</b><small>EPUB, FB2, PDF, TXT</small></span></button>
+    <button class="fab-item" role="menuitem" data-add="two"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h6a2 2 0 0 1 2 2v12a2 2 0 0 0-2-2H4zM20 5h-6a2 2 0 0 0-2 2v12a2 2 0 0 1 2-2h6z"/></svg><span><b>Две книги</b><small>Оригинал и перевод рядом</small></span></button>
+  </div>
+  <button class="fab" id="fab" aria-label="Добавить книгу" aria-haspopup="menu" aria-expanded="false"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>Добавить</span></button>
+</div>
+<nav class="pdots" id="pdots" role="tablist" aria-label="Разделы" hidden>
+  <button role="tab" data-tab="lib" aria-label="Главная" aria-selected="true"><i></i></button>
+  <button role="tab" data-tab="stats" aria-label="Статистика" aria-selected="false" tabindex="-1"><i></i></button>
+  <button role="tab" data-tab="coll" aria-label="Коллекция" aria-selected="false" tabindex="-1"><i></i></button>
+</nav>
+
 <div class="sheet" id="sheet" role="dialog" aria-label="Перевод" hidden><div class="sheet-in" id="sheet-in"></div></div>
 <div class="scrim" id="scrim" hidden><div class="panel" id="panel" role="dialog" aria-modal="true"></div></div>
 <div class="tour" id="tour" role="dialog" aria-modal="true" aria-labelledby="tour-h" hidden></div>
@@ -851,6 +915,9 @@ const IN_CLAUDE = !!(window.claude && typeof window.claude.use === 'function');
 const ICON = {
   gear: '<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg>',
   back: '<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>',
+  find: '<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.6" cy="10.6" r="5.9"/><path d="M15 15l5 5"/></svg>',
+  up: '<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 14.5l6-6 6 6"/></svg>',
+  down: '<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9.5l6 6 6-6"/></svg>',
   toc: '<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 6.5H20M9.5 12H20M9.5 17.5H20"/><circle cx="4.8" cy="6.5" r=".9" fill="currentColor"/><circle cx="4.8" cy="12" r=".9" fill="currentColor"/><circle cx="4.8" cy="17.5" r=".9" fill="currentColor"/></svg>',
   coll: '<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.6l2.6 5.4 5.9.8-4.3 4.1 1.1 5.9L12 17l-5.3 2.8 1.1-5.9L3.5 9.8l5.9-.8z"/></svg>',
   mark: '<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10a1 1 0 011 1v15l-6-4-6 4V5a1 1 0 011-1z"/></svg>',
@@ -1628,6 +1695,7 @@ function show(v) {
   finishSwap();
   const from = curView; curView = v;
   document.body.classList.toggle('in-reader', v === 'reader'); document.body.classList.toggle('covered', v !== 'lib');
+  tabsSync();
   closeSheetRaw(true); NAV.pop('sheet', true); closePanelRaw(true); NAV.pop('panel', true);
   views.lib.hidden = false;
   if (from === v) return;
@@ -1698,7 +1766,7 @@ function cardsFor(list, bi) {
 let bootT = 0;
 async function renderLibrary() {
   const list = (await idb.all('books')).sort((a, b) => (b.openedAt || 0) - (a.openedAt || 0));
-  $('#lib-books').innerHTML = list.length ? '<h2 class="sec-h">Недавние</h2><div class="books">' + cardsFor(list, false).join('') + '</div>' : '';
+  $('#lib-books').innerHTML = list.length ? '<h2 class="sec-h">Недавние</h2><div class="books">' + cardsFor(list, false).join('') + '</div>' : '<div class="lib-empty"><b>Здесь появятся твои книги</b><span>Нажми «Добавить» внизу и выбери файл EPUB, FB2, PDF или TXT. Можно сразу две книги: оригинал и перевод.</span></div>';
   $('#lib-samples').innerHTML = SAMPLES.map(s => bookCard(s, true)).join('');
   const bb = $('#lib-builtin');
   if (bb) bb.innerHTML = BI.available ? '<h2 class="sec-h">Встроенные книги</h2><div class="books">' + cardsFor(BI.list(), true).join('') + '</div>' : '';
@@ -1807,12 +1875,13 @@ function viewTop() { return scroller.getBoundingClientRect().top + (R.padT || 0)
 
 async function openBook(book, meta) {
   closeBook();
-  R.book = book; R.meta = meta; R.ch = 0; R.px = null; R.pq = null; R.lastA = null; R.par = false; R.hold = null; R.dy = 0; R.spread = 0; R.laidH = false;
+  R.book = book; R.meta = meta; R.ch = 0; R.px = null; R.pq = null; R.lastA = null; R.par = false; R.made = []; R.rowsOn = false; R.hold = null; R.dy = 0; R.spread = 0; R.laidH = false;
   R.kind = book.format === 'pdf' ? 'pdf' : 'text';
   show('reader'); NAV.push('reader', leaveReader);
   $('#r-title').textContent = book.title; $('#r-sub').textContent = ''; $('#r-sub').__t = '';
   vReader.classList.toggle('pdfmode', R.kind === 'pdf'); vReader.classList.remove('paged');
   bookEl.hidden = R.kind === 'pdf'; pdfEl.hidden = R.kind !== 'pdf';
+  $('#b-find').hidden = R.kind !== 'text';
   const bp = $('#b-par'); bp.hidden = !(R.kind === 'text' && meta.pair && !meta.sample); bp.setAttribute('aria-pressed', 'false');
   const bl = $('#b-lang'), other = langTag({ lang: meta.pairLang });          /* a paired book can be read in either language */
   bl.hidden = bp.hidden; $('#b-lang-t').textContent = other;
@@ -1829,6 +1898,7 @@ async function openBook(book, meta) {
 }
 /* keepDom: the screen is still sliding away, so the page stays as it is until it is gone */
 function closeBook(keepDom) {
+  findReset();
   if (R.book) {
     persistNow();
     R.token++;
@@ -1906,6 +1976,7 @@ function applyGeometry() {
   const land = scroller.clientWidth > scroller.clientHeight * 1.1;
   const sbs = !!(R.par && land && W >= 640);          /* wide screen + parallel text: the text on the left, its translation on the right */
   R.sbs = sbs; vReader.classList.toggle('sbs', sbs); bookEl.classList.toggle('sbs', sbs);
+  syncRows(sbs);
   if (!h) {
     for (const k of ['width', 'height', 'columnCount', 'columnGap', 'transform']) bookEl.style[k] = '';
     pager.style.width = ''; pager.style.height = '';
@@ -2089,6 +2160,7 @@ function setChrome(on) {
   R.chrome = on;
   for (const b of [barTop, barBot]) { b.classList.toggle('off', !on); b.inert = !on; }
   if (on) { R.lastShow = scroller.scrollTop; updateProgress(); }
+  fbarPlace();
 }
 let rafId = 0;
 scroller.addEventListener('scroll', () => {
@@ -3941,9 +4013,9 @@ function mutateKeep(fn) {
   applyGeometry(); restoreAnchor(a); updateProgress();
 }
 function removeParallel() {
+  unwrapRows();
   for (const a of bookEl.querySelectorAll('.par-tr')) a.remove();
-  for (const w of bookEl.querySelectorAll('.wide')) w.classList.remove('wide');
-  for (const c of bookEl.querySelectorAll('.pg')) c.classList.remove('pg');
+  R.made = [];
 }
 function insertParallel(px) {
   const mb = px.mb, nb = mb.length / 4, MT = px.mine.texts, TT = px.theirs.texts, lang = R.meta.pairLang || '';
@@ -3968,31 +4040,50 @@ function insertParallel(px) {
     a.textContent = w.arr.join('\n'); el.after(a); n++;
     made.push([a, el, (R.blocks[w.from] && R.blocks[w.from].el) || el]);
   }
-  gridMark(made);
+  R.made = made; R.rowsOn = false;
   return n;
 }
-/* When the screen is wide, the text and its translation sit side by side. Each translation is put on the grid rows of the paragraphs it answers;
-   paragraphs that have no translation use the whole width. (Where this cannot be worked out the translation simply stays under its paragraph.) */
-function gridMark(made) {
-  const rows = new Map(), seen = new Set(), taken = new Map();
-  const rowsOf = chap => { if (seen.has(chap)) return; seen.add(chap); let r = 0; for (const c of chap.children) { if (!c.classList.contains('par-tr')) rows.set(c, ++r); } };
-  for (const [a, el, from] of made) {
-    const chap = a.parentElement;     /* the box that holds a run of paragraphs */
-    if (!chap || (chap.tagName !== 'DIV' && chap.tagName !== 'SECTION') || from.parentElement !== chap) continue;
-    rowsOf(chap);
-    const r0 = rows.get(from), r1 = rows.get(el);
-    if (!r0 || !r1 || r1 < r0) continue;
-    let used = taken.get(chap); if (!used) taken.set(chap, used = new Set());
-    let clash = false; for (let i = r0; i <= r1; i++) if (used.has(i)) clash = true;
-    if (clash) continue;
-    for (let i = r0; i <= r1; i++) used.add(i);
-    a.classList.add('g'); a.style.setProperty('--r', String(r0)); a.style.setProperty('--n', String(r1 - r0 + 1));
-  }
-  for (const [chap, used] of taken) {
-    chap.classList.add('pg');
-    for (const c of chap.children) if (!c.classList.contains('par-tr') && !used.has(rows.get(c))) c.classList.add('wide');
+/* On a wide screen the text and its translation sit side by side. Every bead (a run of paragraphs and what answers it) becomes ONE row of two cells,
+   so a translation always starts level with its paragraphs and the two columns cannot drift apart. Paragraphs without a translation stay in the left half.
+   Turning the phone back to portrait gives every paragraph and translation back their old places (the translation under its paragraph). */
+const ROW_BAD = 'td, th, figure, blockquote, pre';
+function wrapRows() {
+  if (!R.made || R.rowsOn) return;
+  R.rowsOn = true;
+  const mk = c => { const d = document.createElement('div'); d.className = c; return d; };
+  const take = (n, bl, br) => {
+    if (n.classList.contains('brow')) { for (const c of [...n.children]) { if (c.classList.contains('bl')) bl.append(...c.childNodes); else if (c.classList.contains('br')) br.append(...c.childNodes); } n.remove(); }
+    else if (n.classList.contains('par-tr')) br.append(n);
+    else bl.append(n);
+  };
+  for (const [a, last, first] of R.made) {
+    if (!a.isConnected || !first.isConnected || !last.isConnected || a.parentElement.classList.contains('br')) continue;
+    const par = first.parentElement;
+    if (!par || par !== last.parentElement || par.closest(ROW_BAD)) continue;
+    if (first !== last && !(first.compareDocumentPosition(last) & Node.DOCUMENT_POSITION_FOLLOWING)) continue;
+    let brow = first.parentElement.classList.contains('bl') ? first.parentElement.parentElement : null, bl, br;
+    if (brow) { bl = brow.firstChild; br = brow.lastChild; }
+    else {
+      brow = mk('brow'); bl = mk('bl'); br = mk('br'); brow.append(bl, br);
+      par.insertBefore(brow, first); bl.append(first);
+    }
+    /* take in everything up to the last paragraph of this bead */
+    if (!brow.contains(last)) {
+      let n = brow.nextElementSibling, guard = 0;
+      while (n && guard++ < 400) { const nx = n.nextElementSibling, done = n === last || n.contains(last); take(n, bl, br); if (done) break; n = nx; }
+    }
+    if (a.parentElement !== br) br.append(a);
+    a.classList.add('g');
   }
 }
+function unwrapRows() {
+  if (!R.rowsOn) return;
+  R.rowsOn = false;
+  for (const [a, last] of R.made || []) if (a.isConnected && a.parentElement && a.parentElement.classList.contains('br')) last.after(a);
+  for (const brow of [...bookEl.querySelectorAll('.brow')]) { const bl = brow.firstChild; brow.replaceWith(...bl.childNodes); }
+  for (const a of bookEl.querySelectorAll('.par-tr.g')) a.classList.remove('g');
+}
+function syncRows(sbs) { if (R.par) { if (sbs) wrapRows(); else unwrapRows(); } }
 async function setParallel(on, silent) {
   if (!R.book || R.kind !== 'text' || on === R.par) return;
   const book = R.book;
@@ -4149,9 +4240,10 @@ const TA = (() => {
     welcome: wrap(`${phone}${lines(104, 30, 72, 4)}<rect class="ta-hl" x="122" y="35" width="28" height="10" rx="3.5"/>
       <g class="ta-pop"><path class="ta-bub" d="M130 62l-5 -7h10z"/><rect class="ta-bub" x="108" y="62" width="64" height="30" rx="9"/><path class="ta-ln2" d="M117 72h34M117 82h22"/></g>${ring(136, 40)}`),
     add: wrap(`${phone}<rect class="ta-bar" x="102" y="15" width="76" height="14" rx="7"/>
-      <rect class="ta-btn on" x="102" y="37" width="42" height="17" rx="8.5"/><path class="ta-plus" d="M113 45.5h8M117 41.5v8"/><rect class="ta-btn" x="148" y="37" width="30" height="17" rx="8.5"/>
-      <rect class="ta-card" x="102" y="63" width="76" height="24" rx="9"/><rect class="ta-card" x="102" y="92" width="76" height="24" rx="9"/>
-      <circle class="ta-mono" cx="114" cy="75" r="6"/><circle class="ta-mono" cx="114" cy="104" r="6"/><path class="ta-ln2" d="M126 72h30M126 78h20M126 101h34M126 107h18"/><rect class="ta-ring-r" x="99" y="34" width="48" height="23" rx="11.5"/>`),
+      <rect class="ta-card" x="102" y="36" width="76" height="24" rx="9"/><rect class="ta-card" x="102" y="65" width="76" height="24" rx="9"/>
+      <circle class="ta-mono" cx="114" cy="48" r="6"/><circle class="ta-mono" cx="114" cy="77" r="6"/><path class="ta-ln2" d="M126 45h30M126 51h20M126 74h34M126 80h18"/>
+      <rect class="ta-btn on" x="142" y="106" width="38" height="17" rx="8.5"/><path class="ta-plus" d="M153 114.500h8M157 110.500v8"/><rect class="ta-ring-r" x="139" y="103" width="44" height="23" rx="11.5"/>
+      <rect class="ta-bar" x="124" y="128" width="32" height="10" rx="5"/>`),
     pair: wrap(`${phone}<rect class="ta-bar" x="102" y="15" width="76" height="14" rx="7"/>
       <rect class="ta-card" x="100" y="46" width="80" height="34" rx="11"/><circle class="ta-mono" cx="113" cy="63" r="7"/><path class="ta-ln2" d="M125 58h22M125 66h14"/>
       <rect class="ta-lp" x="150" y="53" width="13" height="20" rx="6"/><rect class="ta-lp on" x="165" y="53" width="13" height="20" rx="6"/>
@@ -4178,12 +4270,12 @@ const PWA = { prompt: null, ready: false, installed: false };
 function tourSteps() {
   const steps = [
     { art: 'welcome', h: 'Читай и переводи', p: 'Книги на английском и арабском. Нажми на слово, чтобы увидеть перевод прямо в тексте. Короткое знакомство займёт полминуты.' },
-    { art: 'add', h: 'Добавь книгу', p: 'Кнопка «Открыть книгу» берёт файл FB2, EPUB или PDF с телефона. Книга сохранится в приложении, второй раз выбирать файл не нужно.' },
-    { art: 'pair', h: 'Две книги в одной строке', p: '«Две книги» связывает оригинал и перевод. В списке они стоят в одной строке: нажми EN или RU, чтобы читать на нужном языке. Язык можно сменить и внутри книги, на том же месте.' },
+    { art: 'add', h: 'Добавь книгу', p: 'Круглая кнопка «Добавить» внизу справа: выбери «Одна книга» и файл FB2, EPUB, PDF или TXT. Книга сохранится в приложении, второй раз выбирать файл не нужно.' },
+    { art: 'pair', h: 'Две книги в одной строке', p: 'В том же меню «Добавить» пункт «Две книги» связывает оригинал и перевод. В списке они стоят в одной строке: нажми EN или RU, чтобы читать на нужном языке. Язык можно сменить и внутри книги, на том же месте.' },
     { art: 'tap', h: 'Нажми на слово', p: 'Тап по слову покажет перевод, а ниже — как это сказано в другой книге. Зажми слово: можно выбрать слово или предложение и добавить в заметки. Закрыть окно можно жестом «назад» или тапом по тексту.' },
-    { art: 'panels', h: 'Панели и настройки', p: 'Тап по центру экрана показывает и прячет панели. Сверху: оглавление, перевод под абзацами и настройки «Aa» с темой, шрифтом и режимом листания. Внизу полоса прогресса.' },
+    { art: 'panels', h: 'Панели и настройки', p: 'Тап по центру экрана показывает и прячет панели. Сверху: поиск по книге (лупа), оглавление, перевод под абзацами и настройки «Aa» с темой, шрифтом и режимом листания. Внизу полоса прогресса.' },
     { art: 'parallel', h: 'Перевод рядом с текстом', p: 'Для пары книг включи перевод под абзацами. В горизонтальной ориентации оригинал будет слева, а перевод справа. Сопоставленные абзацы можно выгрузить в CSV.' },
-    { art: 'words', h: 'Коллекция и заметки', p: 'Звёздочка у слова кладёт его в коллекцию этой книги: у каждой книги своя, а слово подчёркивается в тексте. Закладка отправляет в заметки и красит место в тексте. Коллекция, заметки и экспорт в Anki открываются звёздочкой вверху главного экрана, а огонёк рядом показывает статистику и стрик.' },
+    { art: 'words', h: 'Коллекция и заметки', p: 'Звёздочка у слова кладёт его в коллекцию этой книги: у каждой книги своя, а слово подчёркивается в тексте. Закладка отправляет в заметки и красит место в тексте. Коллекция, заметки и экспорт в Anki открываются звёздочкой вверху главного экрана, а огонёк рядом показывает статистику и стрик. Между главной, статистикой и коллекцией можно листать свайпом влево и вправо или касаться точек внизу.' },
   ];
   if (!IN_CLAUDE && /^https?:$/.test(location.protocol) && !standaloneNow()) {
     steps.push(isIOS()
@@ -4380,7 +4472,7 @@ function snippet(raw, s, e) {
   const c = x => esc(x.replace(/\s+/g, ' '));
   return (a > 0 ? '…' : '') + c(pre) + '<mark>' + c(raw.slice(s, e)) + '</mark>' + c(raw.slice(e, z)) + (z < raw.length ? '…' : '');
 }
-const FIND = { hits: [], q: '' }, FIND_MAX = 120;
+const FIND = { hits: [], q: '', i: -1 }, FIND_MAX = 120;
 function findInBook(query) {
   const q = foldStr(query).t, hits = [];
   if (q.length < 2) return hits;
@@ -4397,9 +4489,16 @@ function findInBook(query) {
   return hits;
 }
 let findT = 0;
-function flashRange(rg, el) {
+function clearFindMark() {
   clearTimeout(findT);
-  if (hlOK) { CSS.highlights.set('rd-find', new Highlight(rg)); findT = setTimeout(() => CSS.highlights.delete('rd-find'), 6000); }
+  if (hlOK) CSS.highlights.delete('rd-find');
+  for (const e of $$('.find-on, .find-flash')) e.classList.remove('find-on', 'find-flash');
+}
+/* keep: the mark stays while the find bar is up; otherwise it fades by itself */
+function flashRange(rg, el, keep) {
+  clearFindMark();
+  if (hlOK) { CSS.highlights.set('rd-find', new Highlight(rg)); if (!keep) findT = setTimeout(() => CSS.highlights.delete('rd-find'), 6000); }
+  else if (keep) el.classList.add('find-on');
   else { el.classList.add('find-flash'); findT = setTimeout(() => el.classList.remove('find-flash'), 2600); }
 }
 function jumpToHit(h) {
@@ -4412,24 +4511,75 @@ function jumpToHit(h) {
   else if (r) { quiet(600); scroller.scrollTop += r.top - viewTop() - Math.min(140, scroller.clientHeight * 0.2); }
   else gotoEl(b.el);
   closeSheet(); noteAnchor(); updateProgress(); persistSoon();
-  if (rg) flashRange(rg, b.el);
+  const i = FIND.hits.indexOf(h);
+  if (rg) flashRange(rg, b.el, i >= 0);
+  if (i >= 0) fbarShow(i);
+}
+/* the small bar that stays at the bottom while hits are being looked through: previous / next / the list / close */
+function fbarPlace() {
+  const f = $('#fbar'); if (!f) return;
+  f.style.setProperty('--fb', (R.chrome ? $('#r-bot').offsetHeight + 22 : 14) + 'px');
+}
+function fbarShow(i) {
+  const f = $('#fbar'), n = FIND.hits.length; if (!f) return;
+  FIND.i = i;
+  $('#f-cnt').textContent = (i + 1) + ' из ' + n + (n >= FIND_MAX ? '+' : '');
+  fbarPlace(); f.hidden = false;
+}
+function fbarHide() {
+  const f = $('#fbar'); if (f) f.hidden = true;
+  FIND.i = -1; clearFindMark();
+}
+function findReset() { FIND.hits = []; FIND.q = ''; fbarHide(); }
+function findStep(d) {
+  const n = FIND.hits.length; if (!n) return;
+  jumpToHit(FIND.hits[FIND.i < 0 ? (d > 0 ? 0 : n - 1) : (FIND.i + d + n) % n]);
 }
 function bindFind(p, input) {
   const res = $('#toc-res', p), list = $('#toc-list', p);
   let t = 0;
   const run = () => {
     const q = input.value.trim();
-    FIND.q = q;
-    if (foldStr(q).t.length < 2) { FIND.hits = []; res.hidden = true; res.innerHTML = ''; list.hidden = false; return; }
-    const hits = FIND.hits = findInBook(q);
-    list.hidden = true; res.hidden = false; res.scrollTop = 0;
+    if (foldStr(q).t.length < 2) {
+      if (FIND.q || FIND.hits.length) { FIND.q = ''; FIND.hits = []; fbarHide(); }
+      res.hidden = true; res.innerHTML = ''; if (list) list.hidden = false; return;
+    }
+    if (q !== FIND.q || !FIND.hits.length) { FIND.q = q; FIND.hits = findInBook(q); if (FIND.i >= 0) fbarHide(); }
+    const hits = FIND.hits;
+    if (list) list.hidden = true;
+    res.hidden = false; res.scrollTop = 0;
     res.innerHTML = hits.length
-      ? `<div class="toc-cnt">${hits.length >= FIND_MAX ? 'Первые ' + FIND_MAX : 'Найдено ' + hits.length}</div>` + hits.map((h, i) => `<button class="toc-hit" data-hit="${i}"><small>${esc(chapterLabel(h.ch))}</small><span dir="auto">${h.html}</span></button>`).join('')
+      ? `<div class="toc-cnt">${hits.length >= FIND_MAX ? 'Первые ' + FIND_MAX : 'Найдено ' + hits.length}</div>` + hits.map((h, i) => `<button class="toc-hit${i === FIND.i ? ' cur' : ''}" data-hit="${i}"><small>${esc(chapterLabel(h.ch))}</small><span dir="auto">${h.html}</span></button>`).join('')
       : '<p class="muted">Ничего не найдено</p>';
+    const c = res.querySelector('.toc-hit.cur'); if (c) c.scrollIntoView({ block: 'center' });
   };
   input.addEventListener('input', () => { clearTimeout(t); t = setTimeout(run, 180); });
   input.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); clearTimeout(t); run(); input.blur(); } });
+  return run;
 }
+/* the magnifier in the top bar: a window made for searching, the field is ready for typing at once */
+function openFind() {
+  if (!R.book || R.kind !== 'text' || !R.blocks.length) return;
+  const html = `<h2>Поиск по книге <button class="icon-btn" data-close aria-label="Закрыть">${ICON.close}</button></h2>` +
+    '<div class="toc-find"><input type="search" id="toc-q" placeholder="Слово или фраза" aria-label="Поиск по книге" enterkeyhint="search" autocomplete="off" autocapitalize="off" spellcheck="false"></div><div id="toc-res" hidden></div>' +
+    '<div id="toc-list"><p class="muted">Введи слово или фразу: найду все места в книге.</p></div>';
+  openPanel(html, p => {
+    p.onclick = e => {
+      const b = e.target.closest('button'); if (!b) return;
+      if (b.hasAttribute('data-close')) return closePanel();
+      if (b.hasAttribute('data-hit')) { const h = FIND.hits[+b.dataset.hit]; if (!h) return; closePanel(); jumpToHit(h); }
+    };
+    const q = $('#toc-q', p), run = bindFind(p, q);
+    if (FIND.q) { q.value = FIND.q; run(); }
+  }, { noFocus: true });
+  const q = $('#toc-q'); if (q) { q.focus(); if (q.value) q.select(); }
+}
+$('#b-find').addEventListener('click', openFind);
+$('#f-list').addEventListener('click', openFind);
+$('#f-prev').addEventListener('click', () => findStep(-1));
+$('#f-next').addEventListener('click', () => findStep(1));
+$('#f-x').addEventListener('click', fbarHide);
+new MutationObserver(() => { if (views.reader.hidden) fbarHide(); }).observe(views.reader, { attributes: true, attributeFilter: ['hidden'] });
 
 /* the screen stays on while a book is open (switch in the settings); the browser lets go of it by itself when the page is hidden */
 let wakeLock = null, wakeQ = Promise.resolve();
@@ -4990,6 +5140,87 @@ const refreshCollSoon = debounce(scanColl, 160), refreshMarksSoon = debounce(ref
 function refreshAllMarks() { refreshMarks(); scanColl(); }
 Coll.subs.add(() => { if (R.book && !views.reader.hidden) refreshCollSoon(); });
 Notes.subs.add(() => { if (R.book && !views.reader.hidden) refreshMarksSoon(); });
+/* ---------- adding a book (one round button with a small menu) and the three main screens: library, statistics, collection ---------- */
+var tabReady = false;
+const TABS = ['lib', 'stats', 'coll'];
+function fabOpen(on) {
+  const menu = $('#fab-menu'), fab = $('#fab'); if (!menu) return;
+  menu.hidden = !on; $('#fab-scrim').hidden = !on; fab.setAttribute('aria-expanded', String(on)); $('#fab-wrap').classList.toggle('open', on);
+  if (on) { const f = menu.querySelector('button'); if (f) f.focus(); }
+}
+function tabsSync() {
+  if (!tabReady) return;
+  const inTabs = TABS.includes(curView);
+  $('#pdots').hidden = !inTabs;
+  $('#fab-wrap').hidden = curView !== 'lib';
+  if (curView !== 'lib') fabOpen(false);
+  for (const b of $$('#pdots [role=tab]')) { const on = b.dataset.tab === curView; b.setAttribute('aria-selected', String(on)); b.tabIndex = on ? 0 : -1; }
+}
+let tabDirT = 0;
+/* go to a neighbouring main screen; the entering screen comes from the side the finger is going to */
+function tabGo(to) {
+  const from = curView;
+  if (from === to || !TABS.includes(from) || !TABS.includes(to)) return;
+  const fwd = TABS.indexOf(to) > TABS.indexOf(from);
+  document.body.dataset.tab = fwd ? 'f' : 'b';
+  clearTimeout(tabDirT); tabDirT = setTimeout(() => { delete document.body.dataset.tab; }, 600);
+  if (to === 'lib') { if (!NAV.pop(from)) show('lib'); return; }
+  if (from !== 'lib') NAV.pop(from, true);          /* the new screen takes the place of the old one in the back history */
+  if (to === 'stats') stOpen(); else openColl();
+}
+function swipeTab(dx) {
+  if (curView === 'notes') { if (dx > 0) { if (!NAV.pop('notes')) show('coll'); } return; }
+  const i = TABS.indexOf(curView); if (i < 0) return;
+  const to = TABS[i + (dx < 0 ? 1 : -1)];
+  if (to) tabGo(to);
+}
+(() => {
+  const wrap = $('#fab-wrap'), fab = $('#fab'), menu = $('#fab-menu');
+  fab.addEventListener('click', () => fabOpen(menu.hidden));
+  menu.addEventListener('click', e => {
+    const b = e.target.closest('[data-add]'); if (!b) return;
+    fabOpen(false); $(b.dataset.add === 'two' ? '#file-pair' : '#file').click();
+  });
+  $('#fab-scrim').addEventListener('click', () => fabOpen(false));   /* the tap that closes the menu does not reach what is under it */
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && !menu.hidden) { fabOpen(false); fab.focus(); } });
+  addEventListener('scroll', () => wrap.classList.toggle('mini', scrollY > 48), { passive: true });
+
+  $('#pdots').addEventListener('click', e => { const b = e.target.closest('[data-tab]'); if (b) tabGo(b.dataset.tab); });
+  $('#pdots').addEventListener('keydown', e => {
+    if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+    const to = TABS[TABS.indexOf(curView) + (e.key === 'ArrowRight' ? 1 : -1)];
+    if (to) { e.preventDefault(); tabGo(to); setTimeout(() => { const t = $('#pdots [aria-selected=true]'); if (t) t.focus(); }, 0); }
+  });
+
+  /* swipe: a quick, mostly horizontal drag on one of the main screens */
+  let s = null;
+  const skip = el => {
+    for (let n = el; n && n !== document.body; n = n.parentElement) {
+      if (n.matches && n.matches('input, textarea, select, [contenteditable], [role=slider], .no-swipe')) return true;
+      if (n.scrollWidth > n.clientWidth + 4) { const ox = getComputedStyle(n).overflowX; if (ox === 'auto' || ox === 'scroll') return true; }
+      if (n.id && n.id.startsWith('v-')) break;
+    }
+    return false;
+  };
+  document.addEventListener('pointerdown', e => {
+    s = null;
+    if (!e.isPrimary || (e.pointerType === 'mouse' && e.button !== 0) || !e.target.closest) return;
+    if (!e.target.closest('#v-lib, #v-stats, #v-coll, #v-notes')) return;
+    if (e.clientX < 14 || e.clientX > innerWidth - 14) return;          /* the edges belong to the phone's own back gesture */
+    if (skip(e.target)) return;
+    s = { x: e.clientX, y: e.clientY, t: e.timeStamp, id: e.pointerId };
+  }, { passive: true });
+  document.addEventListener('pointerup', e => {
+    const d = s; s = null;
+    if (!d || e.pointerId !== d.id) return;
+    const dx = e.clientX - d.x, dy = e.clientY - d.y;
+    if (Math.abs(dx) < 56 || Math.abs(dx) < Math.abs(dy) * 1.6 || e.timeStamp - d.t > 900) return;
+    const sel = window.getSelection && window.getSelection(); if (sel && String(sel).length) return;
+    swipeTab(dx);
+  }, { passive: true });
+  document.addEventListener('pointercancel', () => { s = null; }, { passive: true });
+  tabReady = true; tabsSync();
+})();
 
 /* ---------- the translation sheet ---------- */
 const sheetEl = $('#sheet'), sheetIn = $('#sheet-in');
@@ -5543,7 +5774,7 @@ function openColl() { renderColl(); show('coll'); NAV.push('coll', () => show('l
 function init() {
   Coll.init(); Notes.init(); applyPrefs();
   $('#b-back').innerHTML = ICON.back; $('#b-coll-back').innerHTML = ICON.back; $('#b-notes-back').innerHTML = ICON.back; $('#c-notes-i').innerHTML = ICON.mark;
-  $('#b-lang').addEventListener('click', switchLang); $('#b-toc').innerHTML = ICON.toc; $('#b-par').innerHTML = ICON.par; $('#b-coll-lib').innerHTML = ICON.coll; $('#b-set-lib').innerHTML = ICON.gear;
+  $('#b-lang').addEventListener('click', switchLang); $('#b-toc').innerHTML = ICON.toc; $('#b-find').innerHTML = ICON.find; $('#f-list').innerHTML = ICON.toc; $('#f-prev').innerHTML = ICON.up; $('#f-next').innerHTML = ICON.down; $('#f-x').innerHTML = ICON.close; $('#b-par').innerHTML = ICON.par; $('#b-coll-lib').innerHTML = ICON.coll; $('#b-set-lib').innerHTML = ICON.gear;
   $('#b-theme').addEventListener('click', toggleTheme); $('#b-theme2').addEventListener('click', toggleTheme); $('#b-theme4').addEventListener('click', toggleTheme);
   $('#b-set-lib').addEventListener('click', openSettings);
   if (darkMQ.addEventListener) darkMQ.addEventListener('change', applyPrefs);
@@ -5560,7 +5791,7 @@ function init() {
   }
 }
 init();
-if (window.__RD_TEST) window.__rd = { Coll, Notes, CF, collKeys, savedEntry, collExportList, openNotes, idb, gotoPageNo, pairSwitch, coverFor, thumbOf, backfillCovers, anchorKnots, chapterGroups, learnLexicon, alignGlobal, alignSeq, chapterPlan, buildAnchors, alignBooks, mmWord, mmSentence, mmChunks, ggWord, ggSentence, ggCall, mtWord, mtSentence, dictWord, dictForms, dictParse, dictImport, dictClear, dictLoad, dictSenses, parseTable, parseStarDict, errCopy, eng, findInBook, jumpToHit, tocCurrent, wakeState: () => !!wakeLock, wakeSync, FIND, R, BI, setParallel, exportAligned, anchorNow, restoreAnchor, goSpread, turn, relayoutKeep, pageState, setChrome, gotoChapter, pairLocate, sentencesOf, buildIndex, pxFrom, alignBooks, ensurePair, windowAt, extractFlat, alignSeq, bookLang, parseBook, importFile, P, API, Keys, eng, S: () => S };
+if (window.__RD_TEST) window.__rd = { wrapRows, unwrapRows, Coll, Notes, CF, collKeys, savedEntry, collExportList, openNotes, idb, gotoPageNo, pairSwitch, coverFor, thumbOf, backfillCovers, anchorKnots, chapterGroups, learnLexicon, alignGlobal, alignSeq, chapterPlan, buildAnchors, alignBooks, mmWord, mmSentence, mmChunks, ggWord, ggSentence, ggCall, mtWord, mtSentence, dictWord, dictForms, dictParse, dictImport, dictClear, dictLoad, dictSenses, parseTable, parseStarDict, errCopy, eng, findInBook, jumpToHit, openFind, findStep, fbarHide, tocCurrent, wakeState: () => !!wakeLock, wakeSync, FIND, R, BI, setParallel, exportAligned, anchorNow, restoreAnchor, goSpread, turn, relayoutKeep, pageState, setChrome, gotoChapter, pairLocate, sentencesOf, buildIndex, pxFrom, alignBooks, ensurePair, windowAt, extractFlat, alignSeq, bookLang, parseBook, importFile, P, API, Keys, eng, S: () => S };
 })();
 </script>
 
