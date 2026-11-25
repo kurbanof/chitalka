@@ -641,9 +641,7 @@ body.boot .lib-hero, body.boot .sec-h, body.boot .book-card, body.boot .empty { 
 
 /* ---------- statistics tab ---------- */
 #b-stat-lib { position: relative; }
-#b-stat-lib svg { width: 24px; height: 24px; fill: currentColor; stroke: none; }
-#b-stat-lib.on { color: var(--accent); }
-#b-stat-lib.off { color: var(--ink-3); }
+#b-stat-lib svg { width: 22px; height: 22px; fill: currentColor; stroke: none; }
 .st-n { position: absolute; right: 1px; bottom: 3px; min-width: 17px; height: 17px; padding: 0 4px; box-sizing: border-box; border-radius: 99px; display: grid; place-items: center; background: var(--accent); color: var(--on-accent); font: 800 11px/1 var(--font-ui); box-shadow: 0 0 0 2px var(--glass-strong, var(--bg)); }
 .st-n:empty { display: none; }
 @media (max-width: 360px) { .top .icon-btn { width: 40px; } .top h1 { font-size: 18px; padding-left: 4px; } }
@@ -724,9 +722,9 @@ body.boot .lib-hero, body.boot .sec-h, body.boot .book-card, body.boot .empty { 
 .goal.out .goal-in { animation: goal-out .25s ease-in both; }
 @media (prefers-reduced-motion: reduce) { .goal-in, .goal-ic, .goal-c i, .st-bar i { animation: none !important; transition: none !important; } .goal-c { display: none; } }
 </style>
-<div class="bg" aria-hidden="true"></div>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="icon" href="icon-192.png" type="image/png" sizes="192x192">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Читалка">
@@ -735,6 +733,7 @@ body.boot .lib-hero, body.boot .sec-h, body.boot .book-card, body.boot .empty { 
 <meta name="description" content="Читалка книг FB2, EPUB, PDF с переводом по тапу">
 </head>
 <body>
+<div class="bg" aria-hidden="true"></div>
 <div id="app">
   <section id="v-lib">
     <header class="top">
@@ -4578,7 +4577,7 @@ async function backfillCovers() {
 /* ---------- statistics: pages, time, new words, a streak and a reading plan — all kept on this device ---------- */
 const ST_KEY = 'rd.stats';
 const ST_MIN = 5;                       // with no plan, a day counts for the streak at this many pages
-ICON.flame = '<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12.3 2.2c.6 3.2 3.2 4.7 4.6 7.6 1.1 2.4 1 5.3-.8 7.5A6.2 6.2 0 0 1 12 20.2a6.2 6.2 0 0 1-4.7-2.1c-1.5-1.8-1.7-4.2-.7-6.3.4-.8.9-1.4 1.5-2 .2 1.2.7 2 1.6 2.4-.5-3.8.7-7.6 2.6-10z"/><path fill="#fff" fill-opacity=".55" d="M12 20.2a3.3 3.3 0 0 1-3.3-3.3c0-1.5.9-2.5 1.7-3.4.4.9 1 1.3 1.7 1.4.4-1.2 1-2 1.7-2.7.5 1.1.9 2 .9 3a3.3 3.3 0 0 1-2.7 5z"/></svg>';
+ICON.flame = '<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M12.46 21.98 l-0.58 0.01 -0.7 -0.03 -0.88 -0.12 -0.61 -0.13 -0.52 -0.14 -0.61 -0.21 -0.28 -0.12 -0.52 -0.26 -0.58 -0.38 -0.52 -0.39 -0.36 -0.36 -0.59 -0.66 -0.28 -0.43 -0.27 -0.48 -0.2 -0.44 -0.18 -0.48 -0.22 -0.89 -0.09 -0.76 -0.03 -0.53 0.02 -0.58 0.04 -0.46 0.07 -0.47 0.12 -0.54 0.13 -0.46 0.21 -0.59 0.14 -0.3 0.32 -0.61 0.42 -0.66 0.46 -0.51 0.4 -0.39 0.71 -0.61 0.4 -0.39 0.6 -0.72 0.24 -0.33 0.28 -0.46 0.21 -0.41 0.22 -0.59 0.17 -0.7 0.09 -0.72 0.01 -0.31 -0.01 -0.6 -0.08 -0.93 -0.12 -0.71 0.01 -0.12 0.06 -0.05 0.58 0.13 0.68 0.26 0.66 0.33 0.45 0.29 0.39 0.32 0.74 0.68 0.37 0.46 0.47 0.67 0.38 0.72 0.22 0.51 0.18 0.5 0.2 0.86 0.06 0.49 0.01 0.71 -0.04 0.58 -0.09 0.42 0 0.07 0.03 0.04 0.05 0.01 0.13 -0.05 0.43 -0.26 0.38 -0.36 0.21 -0.25 0.11 -0.18 0.13 -0.32 0.09 -0.41 0 -0.36 0.03 -0.09 0.05 -0.01 0.05 0.03 0.31 0.31 0.46 0.57 0.34 0.48 0.54 0.88 0.33 0.68 0.28 0.67 0.21 0.6 0.26 0.98 0.11 0.64 0.11 1.12 0.03 0.48 -0.02 0.36 -0.13 1.04 -0.11 0.46 -0.13 0.44 -0.21 0.55 -0.27 0.52 -0.47 0.73 -0.41 0.46 -0.37 0.38 -0.31 0.26 -0.49 0.35 -0.39 0.24 -0.51 0.27 -0.76 0.29 -0.68 0.19 -0.62 0.14 -0.48 0.06 -0.3 0.05zM12 20.74 l0.36 -0.02 0.57 -0.1 0.5 -0.12 0.35 -0.13 0.26 -0.14 0.5 -0.34 0.33 -0.31 0.15 -0.18 0.25 -0.37 0.15 -0.26 0.13 -0.36 0.08 -0.3 0.06 -0.37 0.02 -0.51 -0.02 -0.36 -0.04 -0.31 -0.12 -0.45 -0.11 -0.32 -0.18 -0.38 -0.29 -0.44 -0.21 -0.25 -0.3 -0.27 -0.3 -0.24 -0.4 -0.43 -0.29 -0.41 -0.08 -0.16 -0.13 -0.33 -0.12 -0.46 -0.03 -0.22 0.01 -0.72 0.09 -0.59 -0.02 -0.1 -0.06 -0.03 -0.43 0.13 -0.19 0.08 -0.15 0.11 -0.31 0.18 -0.36 0.34 -0.21 0.25 -0.22 0.32 -0.25 0.44 -0.14 0.33 -0.09 0.24 -0.13 0.53 -0.03 0.42 0 0.37 0.05 0.5 -0.05 0.01 -0.1 -0.04 -0.23 -0.2 -0.15 -0.16 -0.15 -0.21 -0.12 -0.23 -0.07 -0.23 -0.04 -0.22 -0.04 -0.04 -0.06 0.01 -0.26 0.3 -0.26 0.35 -0.38 0.63 -0.24 0.6 -0.09 0.29 -0.12 0.48 -0.05 0.28 -0.03 0.56 0.01 0.29 0.02 0.39 0.05 0.27 0.09 0.31 0.13 0.34 0.15 0.27 0.23 0.35 0.14 0.17 0.5 0.45 0.34 0.21 0.26 0.14 0.34 0.13 0.52 0.13 0.27 0.03 0.28 0.07z"/></svg>';
 const stNow = () => (window.__RD_NOW ? window.__RD_NOW() : Date.now());
 const st2 = n => String(n).padStart(2, '0');
 const stDay = t => { const d = new Date(t == null ? stNow() : t); return d.getFullYear() + '-' + st2(d.getMonth() + 1) + '-' + st2(d.getDate()); };

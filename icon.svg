@@ -1,12 +1,29 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
-<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#C79458"/><stop offset="1" stop-color="#6B3F14"/></linearGradient>
-<linearGradient id="p" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFBF2"/><stop offset="1" stop-color="#F1DFC3"/></linearGradient></defs>
-<rect width="512" height="512" rx="116" fill="url(#g)"/>
-<g transform="translate(256 256) scale(1) translate(-256 -256)">
-<path d="M256 196C216 168 156 162 98 184V382C156 360 216 366 256 394Z" fill="url(#p)"/>
-<path d="M256 196C296 168 356 162 414 184V382C356 360 296 366 256 394Z" fill="#F6E8D0"/>
-<path d="M256 196V394" stroke="#8A5522" stroke-opacity=".35" stroke-width="5"/>
-<path d="M132 226c34-9 70-6 98 10M132 262c34-9 70-6 98 10M132 298c34-9 70-6 98 10" fill="none" stroke="#8A5522" stroke-opacity=".35" stroke-width="9" stroke-linecap="round"/>
-<g><rect x="286" y="86" width="150" height="104" rx="30" fill="#FFF8EC"/><path d="M318 188l-6 34 38-32z" fill="#FFF8EC"/>
-<text x="361" y="161" text-anchor="middle" font-family="Manrope, Inter, Arial, sans-serif" font-weight="800" font-size="62" fill="#7A4A1C">A→Я</text></g>
-</g></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Open book with ABC and АБВ on milk-white pages">
+<defs>
+ <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#F8F0DF"/><stop offset=".56" stop-color="#F0DDC5"/><stop offset="1" stop-color="#D9BE9F"/></linearGradient>
+ <linearGradient id="glass" x1="0" y1="0" x2=".9" y2="1"><stop stop-color="#FFFDF6" stop-opacity=".88"/><stop offset=".5" stop-color="#F8EBD8" stop-opacity=".48"/><stop offset="1" stop-color="#CDAA80" stop-opacity=".28"/></linearGradient>
+ <linearGradient id="paper" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#FFFEF9"/><stop offset=".68" stop-color="#FFFDF7"/><stop offset="1" stop-color="#F8F0E3"/></linearGradient>
+ <linearGradient id="cover" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#A97949"/><stop offset="1" stop-color="#70451F"/></linearGradient>
+ <filter id="shadow" x="-30%" y="-30%" width="160%" height="170%"><feGaussianBlur stdDeviation="13"/></filter>
+</defs>
+<rect width="512" height="512" rx="112" fill="url(#bg)"/>
+<rect x="34" y="34" width="444" height="444" rx="96" fill="url(#glass)" stroke="#FFF9ED" stroke-opacity=".78" stroke-width="2"/>
+<path d="M66 131C150 62 345 56 446 132" fill="none" stroke="#FFFDF4" stroke-opacity=".42" stroke-width="3"/>
+<ellipse cx="256" cy="386" rx="167" ry="28" fill="#76502D" opacity=".25" filter="url(#shadow)"/>
+<path d="M91 176Q172 143 255 181V372Q171 340 91 373Q77 378 77 361V194Q77 181 91 176Z" fill="url(#cover)"/>
+<path d="M421 176Q340 143 257 181V372Q341 340 421 373Q435 378 435 361V194Q435 181 421 176Z" fill="url(#cover)"/>
+<path d="M105 148Q177 126 256 165V357Q177 322 105 350Q91 355 91 339V166Q91 153 105 148Z" fill="#E8D4B8" stroke="#C7A982" stroke-width="2"/>
+<path d="M407 148Q335 126 256 165V357Q335 322 407 350Q421 355 421 339V166Q421 153 407 148Z" fill="#E8D4B8" stroke="#C7A982" stroke-width="2"/>
+<path d="M105 132Q178 112 256 157V347Q178 315 105 341Q91 346 91 330V150Q91 137 105 132Z" fill="url(#paper)" stroke="#FFFEFA" stroke-width="3"/>
+<path d="M407 132Q334 112 256 157V347Q334 315 407 341Q421 346 421 330V150Q421 137 407 132Z" fill="url(#paper)" stroke="#FFFEFA" stroke-width="3"/>
+<path d="M256 158V348" stroke="#E5D2B6" stroke-width="3" stroke-linecap="round"/>
+<g fill="#805A37" font-family="Arial, 'DejaVu Sans', sans-serif" font-size="42" font-weight="700" text-anchor="middle">
+ <text x="177" y="224" letter-spacing="1">ABC</text>
+ <text x="335" y="224" letter-spacing="1">АБВ</text>
+</g>
+<g fill="none" stroke="#C7A782" stroke-width="10" stroke-linecap="round" opacity=".65">
+ <path d="M132 251Q179 241 224 270"/><path d="M128 286Q179 275 224 304"/>
+ <path d="M380 251Q333 241 288 270"/><path d="M384 286Q333 275 288 304"/>
+</g>
+<path d="M60 91Q120 51 185 62" fill="none" stroke="#FFFDF4" stroke-opacity=".48" stroke-width="4" stroke-linecap="round"/>
+</svg>

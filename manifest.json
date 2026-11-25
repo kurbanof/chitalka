@@ -1,5 +1,5 @@
 {
-  "id": "./",
+  "id": "chitalka-perevodchik",
   "name": "Читалка-переводчик",
   "short_name": "Читалка",
   "description": "Читалка книг FB2, EPUB, PDF с переводом по тапу",
@@ -37,12 +37,6 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
-    },
-    {
-      "src": "icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any"
     }
   ]
 }

@@ -101,6 +101,13 @@ textarea { position: fixed; left: -9999px; top: 0; }
       });
     }).catch(function (e) { bad.push(f[0]); row('#files', 'bad', f[0], 'не загрузился: ' + (e && e.message || e)); });
   });
+  /* the browser only reads the manifest link when it sits inside <head> */
+  tests.push(fetch('index.html?check=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.text() : ''; }).then(function (t) {
+    if (!t) return;
+    var d = new DOMParser().parseFromString(t, 'text/html');
+    if (d.head.querySelector('link[rel="manifest"]')) row('#files', 'ok', 'Ссылка на манифест в index.html', 'браузер её видит');
+    else { bad.push('index.html'); row('#files', 'bad', 'index.html', 'браузер не видит ссылку на манифест: загрузи index.html из свежего архива'); }
+  }).catch(function () {}));
   /* leftovers of the old layout with a sub-folder */
   tests.push(fetch('icons/icon-192.png?check=' + Date.now(), { cache: 'no-store' }).then(function (r) { if (r.ok) row('#files', 'ok', 'Папка icons', 'от старой версии: она не мешает, но не нужна'); }).catch(function () {}));
 
