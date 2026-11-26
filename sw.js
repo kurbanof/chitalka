@@ -1,5 +1,5 @@
 /* Читалка-переводчик: сервис-воркер. Оболочка приложения лежит в кеше, поэтому книги читаются без интернета. */
-const VER = 'rd-856cc6cf07';
+const VER = 'rd-8afda993bd';
 const SHELL = ['./', 'index.html', 'manifest.json', 'icon-192.png', 'icon-512.png', 'maskable-512.png', 'apple-touch-icon.png', 'icon.svg'];
 const FONTS = /^https:\/\/fonts\.(googleapis|gstatic)\.com\//;
 self.addEventListener('install', e => { e.waitUntil(caches.open(VER).then(c => Promise.all(SHELL.map(u => c.add(u).catch(() => null)))).then(() => self.skipWaiting())); });
