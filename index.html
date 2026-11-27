@@ -3,7 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#F0DDC5">
+<meta name="theme-color" content="#F0DDC5" id="tc">
+<script>try{var p=JSON.parse(localStorage.getItem("rd.prefs")||"{}");document.getElementById("tc").content=(p.theme==="night"||(p.theme!=="day"&&matchMedia("(prefers-color-scheme: dark)").matches))?"#282828":"#F0DDC5"}catch(e){}</script>
 <meta name="mobile-web-app-capable" content="yes">
 
 <title>Читалка-переводчик</title>
@@ -396,6 +397,7 @@ body.in-reader:not(.sheet-open) .toast { bottom: calc(96px + env(safe-area-inset
 .sh-ps { font: 400 15px/1.5 var(--font-read); color: var(--ink-2); margin-top: 6px; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
 .sh-ps.ar { font-family: var(--font-ar); font-size: 18px; line-height: 1.8; }
 .sh-ps b { color: var(--accent-ink); }
+.sh-ps:has(b) { display: block; overflow: visible; }      /* a marked word must not be cut off by the line limit */
 .sh-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .sh-pick { font: 500 17px/1.5 var(--font-read); margin: 6px 0 0; max-height: 9em; overflow: auto; overflow-wrap: anywhere; }
 .sh-pick.ar { font-family: var(--font-ar); font-size: 22px; line-height: 1.8; }
@@ -403,14 +405,6 @@ body.in-reader:not(.sheet-open) .toast { bottom: calc(96px + env(safe-area-inset
 ::highlight(rd-coll) { text-decoration: underline; text-decoration-color: var(--accent); text-decoration-thickness: 2px; }
 ::highlight(rd-mark) { background-color: var(--mk); }
 /* collection: the notes row and the book chips */
-.c-notes { all: unset; box-sizing: border-box; display: flex; align-items: center; gap: 12px; width: 100%; padding: 12px 16px; margin: 14px 0 0; cursor: pointer; border-radius: 22px; background: var(--sheen), var(--glass); border: 1px solid var(--glass-border); box-shadow: var(--shadow), inset 0 1px 0 var(--hl); }
-.c-notes:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.c-notes-i { width: 40px; height: 40px; border-radius: 14px; display: grid; place-items: center; background: var(--chip); color: var(--mk-ink); flex: none; }
-.c-notes-t { flex: 1; min-width: 0; display: grid; }
-.c-notes-t b { font: 800 16px/1.3 var(--font-ui); }
-.c-notes-t small { font: 600 12.5px/1.3 var(--font-ui); color: var(--muted); }
-.c-notes-t small:empty { display: none; }
-.c-notes-go { font: 400 26px/1 var(--font-ui); color: var(--muted); }
 #c-books, #n-books { flex-wrap: nowrap; overflow-x: auto; margin: 12px 0 0; padding-bottom: 4px; scrollbar-width: none; }
 #c-books::-webkit-scrollbar, #n-books::-webkit-scrollbar { display: none; }
 #c-books .chip, #n-books .chip { flex: none; white-space: nowrap; }
@@ -428,7 +422,7 @@ body.in-reader:not(.sheet-open) .toast { bottom: calc(96px + env(safe-area-inset
 
 
 /* ---------- screens: the library is the base, the reader and the collection slide over it ---------- */
-#v-coll, #v-stats, #v-notes { position: fixed; inset: 0; z-index: 12; background: var(--bg); overflow-y: auto; overscroll-behavior: contain;
+#v-coll, #v-stats { position: fixed; inset: 0; z-index: 12; background: var(--bg); overflow-y: auto; overscroll-behavior: contain;
   padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-bottom: 48px; }
 #v-lib.under { visibility: hidden; }
 body.covered { overflow: hidden; }
@@ -450,6 +444,7 @@ body.covered { overflow: hidden; }
 .scrim.out .panel { animation: pop-out .2s cubic-bezier(.4, 0, 1, 1) both; }
 @keyframes toast-in { from { opacity: 0; transform: translate(-50%, 16px) scale(.96); } to { opacity: 1; transform: translate(-50%, 0); } }
 @keyframes toast-out { from { opacity: 1; transform: translate(-50%, 0); } to { opacity: 0; transform: translate(-50%, 10px) scale(.97); } }
+.toast.hint { bottom: calc(84px + env(safe-area-inset-bottom, 0px)); border-radius: 18px; text-align: left; font-weight: 600; line-height: 1.4; width: min(88vw, 23rem); max-width: none; box-sizing: border-box; cursor: pointer; }
 .toast { animation: toast-in .3s cubic-bezier(.2, .8, .2, 1) both; }
 .toast.out { animation: toast-out .2s ease-in both; }
 
@@ -652,9 +647,14 @@ body.boot .lib-hero, body.boot .sec-h, body.boot .book-card, body.boot .empty { 
 .pb-go:focus-within input { background: color-mix(in srgb, var(--accent) 30%, transparent); }
 
 /* ---------- statistics tab ---------- */
-#b-stat-lib { position: relative; }
-#b-stat-lib svg { width: 22px; height: 22px; fill: currentColor; stroke: none; }
-.st-n { position: absolute; right: 1px; bottom: 3px; min-width: 17px; height: 17px; padding: 0 4px; box-sizing: border-box; border-radius: 99px; display: grid; place-items: center; background: var(--accent); color: var(--on-accent); font: 800 12px/1 var(--font-ui); box-shadow: 0 0 0 2px var(--glass-strong, var(--bg)); }
+/* the streak counter in the library header: a small chip, only while a streak is running */
+.streak-chip { all: unset; box-sizing: border-box; flex: none; display: inline-flex; align-items: center; gap: 5px; height: 44px; padding: 0 12px 0 10px; border-radius: 22px; cursor: pointer; color: var(--ink-3); font: 800 16px/1 var(--font-ui); }
+.streak-chip[hidden] { display: none; }
+.streak-chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.streak-chip:hover { background: var(--chip); }
+.streak-chip svg { width: 22px; height: 22px; fill: currentColor; stroke: none; }
+.streak-chip.on { color: var(--accent); }
+.streak-chip .st-n { font-style: normal; }
 .st-n:empty { display: none; }
 @media (max-width: 360px) { .top .icon-btn { width: 40px; } .top h1 { font-size: 18px; padding-left: 4px; } }
 #st-root { display: grid; gap: 12px; margin-top: 14px; padding-bottom: 28px; }
@@ -757,16 +757,16 @@ body.boot .lib-hero, body.boot .sec-h, body.boot .book-card, body.boot .empty { 
 .lib-empty b { display: block; font: 800 15px var(--font-ui); margin-bottom: 4px; }
 .lib-empty span { display: block; font: 500 14px/1.45 var(--font-ui); color: var(--ink-2); }
 #v-lib .wrap { padding-bottom: 140px; }
-#v-coll, #v-stats, #v-notes { padding-bottom: 70px; }
+#v-coll, #v-stats { padding-bottom: 70px; }
 .pdots { position: fixed; z-index: 14; left: 0; right: 0; margin-inline: auto; width: fit-content; height: 28px; bottom: calc(env(safe-area-inset-bottom, 0px) + 14px); display: flex; align-items: center; padding: 0 4px; border-radius: 999px; background: var(--sheen), var(--bar-bg); box-shadow: 0 4px 14px var(--shade); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); }
 .pdots button { all: unset; box-sizing: border-box; width: 44px; height: 44px; margin: -8px 0; display: grid; place-items: center; cursor: pointer; border-radius: 999px; }
 .pdots i { width: 7px; height: 7px; border-radius: 99px; background: var(--ink-3); opacity: .6; transition: width .25s, opacity .25s, background .25s; }
 .pdots button[aria-selected=true] i { width: 20px; background: var(--accent); opacity: 1; }
-#v-lib, #v-coll, #v-stats, #v-notes { touch-action: pan-y pinch-zoom; }
+#v-lib, #v-coll, #v-stats { touch-action: pan-y pinch-zoom; }
 #c-books, #n-books { touch-action: pan-x pan-y; }
 @keyframes v-in-l { from { opacity: 0; transform: translateX(-8%); } to { opacity: 1; transform: none; } }
 body[data-tab="b"] .v-enter { animation-name: v-in-l; }
-#v-coll.v-enter, #v-stats.v-enter, #v-notes.v-enter { z-index: 13; }
+#v-coll.v-enter, #v-stats.v-enter { z-index: 13; }
 @media (prefers-reduced-motion: reduce) { .fab, .fab svg.i, .fab span, .pdots i, .fab-menu { transition: none !important; animation: none !important; } }
 
 /* settings: two tabs, folding groups */
@@ -778,6 +778,14 @@ body[data-tab="b"] .v-enter { animation-name: v-in-l; }
 .set-tabs button[aria-selected="true"] { background: var(--glass-strong); color: var(--ink); box-shadow: 0 1px 4px var(--shade), inset 0 1px 0 var(--hl); }
 :root[data-theme="dark"] .set-tabs button[aria-selected="true"] { background: rgba(255, 255, 255, .18); color: #F1F4F8; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .set-tabs button[aria-selected="true"] { background: rgba(255, 255, 255, .18); color: #F1F4F8; } }
+.c-tabs { margin: 14px 0 6px; }
+.c-tabs button { display: inline-flex; align-items: center; justify-content: center; gap: 7px; }
+.c-tabs button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.c-ti { display: inline-grid; place-items: center; color: var(--accent); }
+.c-ti svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.c-tabs small { font: 700 12px/1 var(--font-ui); color: var(--muted); }
+.c-tabs small:empty { display: none; }
+.c-tabs button[aria-selected="true"] small { color: var(--ink-3); }
 .grp + .grp { margin-top: 4px; }
 .grp-h { all: unset; box-sizing: border-box; width: 100%; min-height: 48px; display: flex; align-items: center; justify-content: space-between; gap: 10px; cursor: pointer; font: 800 12.5px/1.2 var(--font-ui); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); -webkit-tap-highlight-color: transparent; }
 .grp-h:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 10px; }
@@ -841,7 +849,6 @@ body[data-tab="b"] .v-enter { animation-name: v-in-l; }
   .btn.sure:hover { filter: brightness(1.06); }
   :is(.chip, .st-link, .wk, .st-bk, .seg button):not([aria-pressed="true"], [aria-checked="true"]):hover { background: var(--line); }
   .st-bk:not([aria-checked="true"]):hover { background: var(--line); }
-  .c-notes:hover { background: var(--sheen), var(--glass-strong); }
   .pdots button:hover i { opacity: 1; background: var(--ink-2); }
   .pdots button[aria-selected=true]:hover i { background: var(--accent); }
   .pb-info:hover { color: var(--accent-ink); }
@@ -866,8 +873,7 @@ body[data-tab="b"] .v-enter { animation-name: v-in-l; }
     <header class="top">
       <h1>Читалка</h1>
       <button class="icon-btn" id="b-theme" aria-label="Сменить тему: день или ночь"></button>
-      <button class="icon-btn" id="b-stat-lib" aria-label="Статистика и стрик"></button>
-      <button class="icon-btn" id="b-coll-lib" aria-label="Коллекция слов"></button>
+      <button class="streak-chip" id="b-stat-lib" aria-label="Статистика и стрик" hidden></button>
       <button class="icon-btn" id="b-set-lib" aria-label="Настройки и движок перевода"></button>
     </header>
     <div class="wrap">
@@ -916,30 +922,27 @@ body[data-tab="b"] .v-enter { animation-name: v-in-l; }
       <button class="icon-btn" id="b-theme2" aria-label="Сменить тему: день или ночь"></button>
     </header>
     <div class="wrap">
-      <button type="button" class="card c-notes" id="c-notes"><span class="c-notes-i" id="c-notes-i"></span><span class="c-notes-t"><b>Заметки</b><small id="c-notes-n"></small></span><span class="c-notes-go" aria-hidden="true">›</span></button>
-      <div class="chips" id="c-books" role="group" aria-label="Коллекция книги"></div>
-      <div class="coll-bar">
-        <input type="search" id="c-q" placeholder="Поиск по словам" aria-label="Поиск по коллекции">
-        <button class="btn btn-primary" id="c-export">Экспорт в Anki</button>
-        <button class="btn btn-soft" id="c-copy">Копировать</button>
+      <div class="set-tabs c-tabs" id="c-tabs" role="tablist" aria-label="Раздел коллекции">
+        <button type="button" role="tab" id="c-tab-w" data-sub="words" aria-selected="true" aria-controls="c-pane-w"><span class="c-ti" id="c-ti-w"></span>Слова <small id="c-nw"></small></button>
+        <button type="button" role="tab" id="c-tab-n" data-sub="notes" aria-selected="false" aria-controls="c-pane-n"><span class="c-ti" id="c-ti-n"></span>Заметки <small id="c-nn"></small></button>
       </div>
-      <div class="cards" id="c-list"></div>
-    </div>
-  </section>
-
-  <section id="v-notes" hidden>
-    <header class="top">
-      <button class="icon-btn" id="b-notes-back" aria-label="Назад"></button>
-      <h1>Заметки <span class="muted" id="n-count"></span></h1>
-      <button class="icon-btn" id="b-theme4" aria-label="Сменить тему: день или ночь"></button>
-    </header>
-    <div class="wrap">
-      <div class="chips" id="n-books" role="group" aria-label="Заметки книги"></div>
-      <div class="coll-bar">
-        <input type="search" id="n-q" placeholder="Поиск по заметкам" aria-label="Поиск по заметкам">
-        <button class="btn btn-soft" id="n-copy">Копировать</button>
+      <div id="c-pane-w" role="tabpanel" aria-labelledby="c-tab-w">
+        <div class="chips" id="c-books" role="group" aria-label="Коллекция книги"></div>
+        <div class="coll-bar">
+          <input type="search" id="c-q" placeholder="Поиск по словам" aria-label="Поиск по коллекции">
+          <button class="btn btn-primary" id="c-export">Экспорт в Anki</button>
+          <button class="btn btn-soft" id="c-copy">Копировать</button>
+        </div>
+        <div class="cards" id="c-list"></div>
       </div>
-      <div class="cards" id="n-list"></div>
+      <div id="c-pane-n" role="tabpanel" aria-labelledby="c-tab-n" hidden>
+        <div class="chips" id="n-books" role="group" aria-label="Заметки книги"></div>
+        <div class="coll-bar">
+          <input type="search" id="n-q" placeholder="Поиск по заметкам" aria-label="Поиск по заметкам">
+          <button class="btn btn-soft" id="n-copy">Копировать</button>
+        </div>
+        <div class="cards" id="n-list"></div>
+      </div>
     </div>
   </section>
 
@@ -1065,7 +1068,7 @@ function applyPrefs() {
   set('--indent', P.indent ? '1.3em' : '0');
   set('--pm', P.indent ? '.2em' : '.85em');
   set('--mx', (P.margins ? 22 : 8) + 'px');
-  for (const b of $$('#b-theme, #b-theme2, #b-theme3, #b-theme4')) b.innerHTML = isDark() ? ICON.sun : ICON.moon;
+  for (const b of $$('#b-theme, #b-theme2, #b-theme3')) b.innerHTML = isDark() ? ICON.sun : ICON.moon;
   const tc = document.querySelector('meta[name="theme-color"]');            /* the phone's status bar follows the theme */
   if (tc) tc.setAttribute('content', isDark() ? '#282828' : '#F0DDC5');
 }
@@ -1232,9 +1235,9 @@ function clean(o) { return JSON.parse(JSON.stringify(o)); }
 
 /* ---------- small UI helpers ---------- */
 let toastT = 0;
-function toast(msg, ms = 2600) {
+function toast(msg, ms = 2600, cls) {
   const t = $('#toast');
-  t.textContent = msg; t.classList.remove('out'); t.hidden = false;
+  t.textContent = msg; t.classList.remove('out'); t.classList.toggle('hint', cls === 'hint'); t.style.bottom = ''; t.hidden = false;
   clearTimeout(toastT); toastT = setTimeout(() => { hideToast(); }, ms);
 }
 function hideToast() {
@@ -1761,13 +1764,13 @@ async function loadPdf(buf, fallbackTitle) {
 }
 
 /* ---------- views ---------- */
-const views = { lib: $('#v-lib'), reader: $('#v-reader'), coll: $('#v-coll'), stats: $('#v-stats'), notes: $('#v-notes') };
+const views = { lib: $('#v-lib'), reader: $('#v-reader'), coll: $('#v-coll'), stats: $('#v-stats') };
 const bookEl = $('#book'), pdfEl = $('#pdf'), scroller = $('#scroller'), pager = $('#pager'), vReader = views.reader;
 /* The library is the base layer. The reader and the collection are screens that slide over it; it stays underneath (so its scroll place survives). */
 let curView = 'lib', swapT = 0;
 function finishSwap() {
   clearTimeout(swapT); swapT = 0;
-  for (const k of ['reader', 'coll', 'stats', 'notes']) {
+  for (const k of ['reader', 'coll', 'stats']) {
     const el = views[k]; el.classList.remove('v-enter', 'v-leave');
     if (k !== curView) { el.hidden = true; if (k === 'reader' && !R.book) wipeReader(); }
   }
@@ -1977,6 +1980,7 @@ async function openBook(book, meta) {
     if (R.kind === 'pdf') { applyGeometry(); await book.mount(pdfEl, meta.pos); updateProgress(); }
     else await mountText(meta.pos);
   } catch (err) { setLoad(false); toast('Ошибка чтения: ' + (err && err.message ? err.message : err), 6000); }
+  setTimeout(() => { if (R.book === book && curView === 'reader') tipOnce('read'); }, 900);
   /* prepare the pair in the background so the first tap does not have to wait for the alignment */
   if (R.kind === 'text' && meta.pair) setTimeout(() => { if (R.book === book) ensurePair().then(() => { if (R.book === book && P.par) setParallel(true, true); }).catch(() => {}); }, 1200);
 }
@@ -4388,45 +4392,38 @@ const TA = (() => {
       <circle class="ta-mono" cx="114" cy="48" r="6"/><circle class="ta-mono" cx="114" cy="77" r="6"/><path class="ta-ln2" d="M126 45h30M126 51h20M126 74h34M126 80h18"/>
       <rect class="ta-btn on" x="142" y="106" width="38" height="17" rx="8.5"/><path class="ta-plus" d="M153 114.500h8M157 110.500v8"/><rect class="ta-ring-r" x="139" y="103" width="44" height="23" rx="11.5"/>
       <rect class="ta-bar" x="124" y="128" width="32" height="10" rx="5"/>`),
-    pair: wrap(`${phone}<rect class="ta-bar" x="102" y="15" width="76" height="14" rx="7"/>
-      <rect class="ta-card" x="100" y="46" width="80" height="34" rx="11"/><circle class="ta-mono" cx="113" cy="63" r="7"/><path class="ta-ln2" d="M125 58h22M125 66h14"/>
-      <rect class="ta-lp" x="150" y="53" width="13" height="20" rx="6"/><rect class="ta-lp on" x="165" y="53" width="13" height="20" rx="6"/>
-      <text class="ta-t" x="156.5" y="66" text-anchor="middle">EN</text><text class="ta-t inv" x="171.5" y="66" text-anchor="middle">RU</text>`),
     tap: wrap(`${phone}${lines(104, 24, 72, 4)}<rect class="ta-hl" x="124" y="29" width="30" height="10" rx="3.5"/>
       <g class="ta-slide"><rect class="ta-sheet" x="98" y="68" width="84" height="73" rx="13"/><rect class="ta-grab" x="130" y="72" width="20" height="3" rx="1.5"/>
-      <rect class="ta-chip" x="106" y="81" width="24" height="9" rx="4.5"/><path class="ta-ln3" d="M106 99h42"/><path class="ta-ln2" d="M106 108h60M106 116h50M106 124h58"/>${star(168, 87)}</g>${ring(139, 34)}`),
-    panels: wrap(`${phone}${lines(104, 56, 72, 5)}
-      <g class="ta-pop"><rect class="ta-bar" x="100" y="11" width="80" height="17" rx="8.5"/><path class="ta-ico" d="M109 15.5l-4 4 4 4"/><path class="ta-ico" d="M128 16h9M128 20h9M128 24h6"/><path class="ta-ico" d="M146 16v8M151 16v8"/><text class="ta-t big" x="168" y="23.5" text-anchor="middle">Aa</text></g>
-      <rect class="ta-trk" x="106" y="128" width="68" height="4" rx="2"/><rect class="ta-fill" x="106" y="128" width="26" height="4" rx="2"/><circle class="ta-knob" cx="132" cy="130" r="4.5"/>${ring(140, 90)}`),
-    parallel: wrap(`<rect class="ta-ph" x="36" y="20" width="208" height="110" rx="16"/><path class="ta-div" d="M140 32v86"/>
-      <text class="ta-t big" x="52" y="40">EN</text><text class="ta-t big on" x="154" y="40">RU</text>
-      ${lines(52, 50, 74, 5, 12)}<path class="ta-ln acc" d="M154 50h72M154 62h72M154 74h72M154 86h72M154 98h46"/><rect class="ta-hl" x="68" y="45" width="30" height="10" rx="3.5"/><rect class="ta-hl" x="172" y="45" width="30" height="10" rx="3.5"/>`),
-    words: wrap(`<g class="ta-pop"><rect class="ta-sheet" x="26" y="26" width="104" height="82" rx="14"/><text class="ta-t big" x="40" y="52">sixteenth</text><path class="ta-ln2" d="M40 66h68M40 78h54"/>${star(112, 44)}</g>
-      <path class="ta-ln2 ta-arrow" d="M138 67h24m-5 -5l5 5-5 5"/>
-      <g class="ta-flip"><rect class="ta-card" x="170" y="34" width="86" height="66" rx="14"/><text class="ta-t big" x="213" y="60" text-anchor="middle">sixteenth</text><path class="ta-ln3" d="M190 72h46"/><text class="ta-t on" x="213" y="90" text-anchor="middle">Anki</text></g>`),
-    install: wrap(`${phone}${Array.from({ length: 9 }, (_, i) => `<rect class="ta-app${i === 7 ? ' on' : ''}" x="${106 + (i % 3) * 25}" y="${24 + Math.floor(i / 3) * 28}" width="18" height="18" rx="5"/>`).join('')}
-      <path class="ta-book" d="M133 85.5c3-1 5.5-.6 7 .8 1.5-1.4 4-1.8 7-.8v8c-3-1-5.5-.6-7 .8-1.5-1.4-4-1.8-7-.8z"/><rect class="ta-ring-r" x="127.5" y="76.5" width="25" height="25" rx="8"/>`)
+      <rect class="ta-chip" x="106" y="81" width="24" height="9" rx="4.5"/><path class="ta-ln3" d="M106 99h42"/><path class="ta-ln2" d="M106 108h60M106 116h50M106 124h58"/>${star(168, 87)}</g>${ring(139, 34)}`)
   };
 })();
 
 const PWA = { prompt: null, ready: false, installed: false };
 
 function tourSteps() {
-  const steps = [
-    { art: 'welcome', h: 'Читай и переводи', p: 'Книги на английском и арабском. Нажми на слово, чтобы увидеть перевод прямо в тексте. Короткое знакомство займёт полминуты.' },
-    { art: 'add', h: 'Добавь книгу', p: 'Круглая кнопка «Добавить» внизу справа: выбери «Одна книга» и файл FB2, EPUB, PDF или TXT. Книга сохранится в приложении, второй раз выбирать файл не нужно.' },
-    { art: 'pair', h: 'Две книги в одной строке', p: 'В том же меню «Добавить» пункт «Две книги» связывает оригинал и перевод. В списке они стоят в одной строке: нажми EN или RU, чтобы читать на нужном языке. Язык можно сменить и внутри книги, на том же месте.' },
-    { art: 'tap', h: 'Нажми на слово', p: 'Тап по слову покажет перевод, а ниже — как это сказано в другой книге. Зажми слово: можно выбрать слово или предложение и добавить в заметки. Закрыть окно можно жестом «назад» или тапом по тексту.' },
-    { art: 'panels', h: 'Панели и настройки', p: 'Тап по центру экрана показывает и прячет панели. Сверху: поиск по книге (лупа), оглавление, перевод под абзацами и настройки «Aa» с темой, шрифтом и режимом листания. Внизу полоса прогресса.' },
-    { art: 'parallel', h: 'Перевод рядом с текстом', p: 'Для пары книг включи перевод под абзацами. В горизонтальной ориентации оригинал будет слева, а перевод справа. Сопоставленные абзацы можно выгрузить в CSV.' },
-    { art: 'words', h: 'Коллекция и заметки', p: 'Звёздочка у слова кладёт его в коллекцию этой книги: у каждой книги своя, а слово подчёркивается в тексте. Закладка отправляет в заметки и красит место в тексте. Коллекция, заметки и экспорт в Anki открываются звёздочкой вверху главного экрана, а огонёк рядом показывает статистику и стрик. Между главной, статистикой и коллекцией можно листать свайпом влево и вправо или касаться точек внизу.' },
+  /* three steps only; the rest is told once, at the moment it is first needed (see tipOnce) */
+  return [
+    { art: 'welcome', h: 'Читай и переводи', p: 'Книги на английском и арабском. Нажми на слово, чтобы увидеть перевод прямо в тексте. Всё остальное подскажем по ходу дела.' },
+    { art: 'add', h: 'Добавь книгу', p: 'Круглая кнопка «Добавить» внизу справа: выбери «Одна книга» и файл FB2, EPUB, PDF или TXT. Есть перевод на другом языке? «Две книги» свяжет их в одну строку списка.' },
+    { art: 'tap', h: 'Нажми на слово', p: 'Тап по слову покажет перевод, а ниже — как это сказано в другой книге. Звёздочка в окне кладёт слово в коллекцию, закладка — в заметки.' }
   ];
-  if (!IN_CLAUDE && /^https?:$/.test(location.protocol) && !standaloneNow()) {
-    steps.push(isIOS()
-      ? { art: 'install', h: 'Установи на телефон', p: 'В Safari нажми «Поделиться» и выбери «На экран “Домой”». Приложение откроется во весь экран и будет работать без интернета (кроме перевода).' }
-      : { art: 'install', h: 'Установи на телефон', p: 'Добавь приложение на главный экран: оно откроется во весь экран и будет работать без интернета (кроме перевода).', install: true });
-  }
-  return steps;
+}
+
+/* one-time hints, each shown the first time the thing is used: the first book opened, the first star, the first bookmark */
+const HINTS = {
+  read: 'Тап по слову — перевод. Зажми слово, чтобы выбрать слово или предложение. Окно закрывается жестом «назад».',
+  star: 'Слово в коллекции этой книги и подчёркнуто в тексте. Вся коллекция — на третьем экране: точки внизу главного экрана или свайп влево.',
+  mark: 'Закладка сохранена, место в тексте закрашено. Все заметки лежат в коллекции, на вкладке «Заметки».'
+};
+function tipOnce(key) {
+  if ((window.__RD_TEST && !window.__RD_HINTS) || tourOn || !HINTS[key]) return false;
+  let seen = ls.get('rd.hints', {}); if (!seen || typeof seen !== 'object') seen = {};
+  if (seen[key]) return false;
+  seen[key] = 1; ls.set('rd.hints', seen);
+  toast(HINTS[key], 8000, 'hint');
+  /* over a bottom sheet the hint sits just above it instead of on top of it */
+  try { if (sheetOpen()) { const r = sheetEl.getBoundingClientRect(); if (r.width > innerWidth * .6 && r.top > innerHeight * .25) $('#toast').style.bottom = Math.round(innerHeight - r.top + 12) + 'px'; } } catch { /* default position */ }
+  return true;
 }
 
 let tourOn = false, tourI = 0, tourList = [], tourEl = null, tourT = 0;
@@ -4479,6 +4476,7 @@ function onTourClick(e) {
 function bindTour() {
   const el = $('#tour'); if (!el) return;
   tourEl = el;
+  $('#toast').addEventListener('click', hideToast);          /* a hint can be dismissed with a tap */
   el.addEventListener('click', onTourClick);
   let sx = 0, sy = 0, st = 0;
   el.addEventListener('touchstart', e => { const t = e.touches[0]; sx = t.clientX; sy = t.clientY; st = Date.now(); }, { passive: true });
@@ -5012,6 +5010,7 @@ function stCelebrate(kind) {
 function stBadge() {
   const b = $('#b-stat-lib'); if (!b) return;
   const sk = stStreak();
+  b.hidden = sk.n === 0;                      /* the counter shows up with the first day of a streak; the screens themselves are reached by the page dots and the swipe */
   b.innerHTML = ICON.flame + '<i class="st-n">' + (sk.n > 0 ? sk.n : '') + '</i>';
   b.classList.toggle('on', sk.today); b.classList.toggle('off', sk.n === 0);
   b.setAttribute('aria-label', 'Статистика' + (sk.n > 0 ? '. Стрик: ' + sk.n + ' ' + stPl(sk.n, ['день', 'дня', 'дней']) : ''));
@@ -5232,7 +5231,7 @@ async function toggleNote(spec) {
   const en = noteEntry(spec);
   try {
     if (Notes.has(en.id)) { await Notes.remove(en.id); toast('Убрано из заметок'); return false; }
-    await Notes.save(en); toast('Добавлено в заметки'); return true;
+    await Notes.save(en); if (!tipOnce('mark')) toast('Добавлено в заметки'); return true;
   } catch { toast('Не удалось сохранить, попробуй ещё раз'); return Notes.has(en.id); }
 }
 
@@ -5313,7 +5312,10 @@ function tabGo(to) {
   if (to === 'stats') stOpen(); else openColl();
 }
 function swipeTab(dx) {
-  if (curView === 'notes') { if (dx > 0) { if (!NAV.pop('notes')) show('coll'); } return; }
+  if (curView === 'coll') {      /* inside the collection the swipe first moves between Words and Notes */
+    if (dx < 0) { if (CF.sub !== 'notes') { setSub('notes'); } return; }
+    if (CF.sub === 'notes') { setSub('words'); return; }
+  }
   const i = TABS.indexOf(curView); if (i < 0) return;
   const to = TABS[i + (dx < 0 ? 1 : -1)];
   if (to) tabGo(to);
@@ -5342,8 +5344,7 @@ function swipeTab(dx) {
     if (!TABS.includes(curView) || !$('#scrim').hidden || !$('#sheet').hidden || !menu.hidden || !$('#tour').hidden) return;
     const t = e.target;
     if (t && t.closest && t.closest('input,textarea,select,[role="slider"],[role="tablist"],[contenteditable]')) return;
-    const to = TABS[TABS.indexOf(curView) + (e.key === 'ArrowRight' ? 1 : -1)];
-    if (to) { e.preventDefault(); tabGo(to); }
+    e.preventDefault(); swipeTab(e.key === 'ArrowRight' ? -1 : 1);
   });
   const TIPS = { 'b-find': ' ( / )', 'b-toc': ' ( T )' };
   document.addEventListener('pointerover', e => {
@@ -5365,7 +5366,7 @@ function swipeTab(dx) {
   document.addEventListener('pointerdown', e => {
     s = null;
     if (!e.isPrimary || (e.pointerType === 'mouse' && e.button !== 0) || !e.target.closest) return;
-    if (!e.target.closest('#v-lib, #v-stats, #v-coll, #v-notes')) return;
+    if (!e.target.closest('#v-lib, #v-stats, #v-coll')) return;
     if (e.clientX < 14 || e.clientX > innerWidth - 14) return;          /* the edges belong to the phone's own back gesture */
     if (skip(e.target)) return;
     s = { x: e.clientX, y: e.clientY, t: e.timeStamp, id: e.pointerId };
@@ -5397,12 +5398,37 @@ function boldIn(sentence, word, idx) {
   if (i < 0) return esc(sentence);
   return esc(sentence.slice(0, i)) + '<b>' + esc(word) + '</b>' + esc(sentence.slice(i + word.length));
 }
-function boldAny(text, phrase) {
-  if (!phrase) return esc(text);
-  let i = text.toLowerCase().length === text.length ? text.toLowerCase().indexOf(phrase.toLowerCase()) : text.indexOf(phrase);
-  if (i < 0) return esc(text);
-  return esc(text.slice(0, i)) + '<b>' + esc(text.slice(i, i + phrase.length)) + '</b>' + esc(text.slice(i + phrase.length));
+/* Which part of a translated sentence is the word? The phrase of the other book if it is found there; otherwise the dictionary's translations,
+   matched by stem because Russian endings change. Only Russian text, and only one place is marked: the one nearest to where the word stands in its sentence. */
+const trNorm = s => s.toLowerCase().replace(/ё/g, 'е');
+function likeStem(t, c) {
+  let p = 0; const n = Math.min(t.length, c.length);
+  while (p < n && t[p] === c[p]) p++;
+  const d = Math.abs(t.length - c.length);
+  return p >= 3 && p >= n - 2 && d <= 3 && (p >= 4 || d <= 1);
 }
+function hiTr(text, phrase, cands, rel) {
+  if (!text) return '';
+  const wrap = (s, e) => esc(text.slice(0, s)) + '<b>' + esc(text.slice(s, e)) + '</b>' + esc(text.slice(e));
+  if (phrase) {
+    const lo = trNorm(text), i = lo.length === text.length ? lo.indexOf(trNorm(phrase)) : text.indexOf(phrase);
+    if (i >= 0) return wrap(i, i + phrase.length);
+  }
+  if (!cands || !cands.length || !/[а-яё]/i.test(text)) return esc(text);
+  const toks = []; const re = /\p{L}+/gu; let m;
+  while ((m = re.exec(text))) toks.push({ s: m.index, e: m.index + m[0].length, w: trNorm(m[0]) });
+  for (const c of cands.slice(0, 5)) {
+    for (const cw of trNorm(String(c)).match(/[а-я]{3,}/g) || []) {
+      const hits = toks.filter(t => likeStem(t.w, cw));
+      if (!hits.length) continue;
+      const at = t => Math.abs(t.s / text.length - (rel >= 0 ? rel : 0.5));
+      const best = hits.reduce((a, b) => (at(b) < at(a) ? b : a));
+      return wrap(best.s, best.e);
+    }
+  }
+  return esc(text);
+}
+const relIn = (sentence, idx) => (sentence && idx >= 0 ? idx / sentence.length : -1);
 function metaParts(v, surface) {
   const out = [];
   if (v.lemmaVoc) out.push('лемма ' + arSpan(v.lemmaVoc));
@@ -5573,18 +5599,20 @@ const bookTitle = st => esc(cut(st.pairTitle, 48));
 const retryBtn = (part, label) => `<button class="btn btn-soft" data-act="retry" data-part="${part}">${label || 'Повторить'}</button>`;
 const skelLines = () => skel(92, 1.15) + skel(64, 1.15);
 const trDiv = (cls, t, tar) => `<div class="${cls}${tar ? ' ar' : ''}" dir="${tar ? 'rtl' : 'auto'}">${t}</div>`;
+/* the sentence translation with the word's own translation marked in it (only in the word sheet) */
+const hiWord = (st, text, phrase) => (st.kind === 'word' ? hiTr(text, phrase, st.w && st.w.st === 'ok' ? st.w.v.translations : null, relIn(st.sentence, st.wordIdx)) : esc(text));
 /* the translation of the sentence made by the engine */
 function ctxMt(st, big) {
   if (!canMT(st)) return '';
   if (st.s.st === 'loading') return skelLines();
   if (st.s.st === 'err') return errOwner(st, 's') ? errHtml(st, 's') : '';
-  if (st.s.st === 'ok') return trDiv(big ? 'sh-sent' : 'sh-ps', esc(st.s.v.translation), st.sentTarget === 'ar');
+  if (st.s.st === 'ok') return trDiv(big ? 'sh-sent' : 'sh-ps', hiWord(st, st.s.v.translation, ''), st.sentTarget === 'ar');
   return '';
 }
 /* the sentence from the other book */
 function pairSent(st, big) {
   const ex = pairEx(st);
-  if (ex) return trDiv(big ? 'sh-sent' : 'sh-ps', boldAny(ex.other, ex.phrase), detectLang(ex.other) === 'ar');
+  if (ex) return trDiv(big ? 'sh-sent' : 'sh-ps', hiWord(st, ex.other, ex.phrase), detectLang(ex.other) === 'ar');
   return st.p.st === 'loading' ? skelLines() : '';
 }
 const mtBtn = st => (canMT(st) && st.s.st === 'none' && st.p.st !== 'loading' ? '<button class="btn btn-ghost sh-mt" data-act="mt">Машинный перевод</button>' : '');
@@ -5723,7 +5751,7 @@ async function toggleSave() {
   try {
     const old = st.kind === 'word' ? savedWord(st) : (() => { const e = entryOf(st); return e && Coll.has(e.id) ? e : null; })();
     if (old) { await Coll.remove(old.id); toast('Убрано из коллекции'); }
-    else { const en = entryOf(st); if (!en) return; await Coll.save(en); toast('Добавлено в коллекцию этой книги'); }
+    else { const en = entryOf(st); if (!en) return; await Coll.save(en); if (!tipOnce('star')) toast('Добавлено в коллекцию этой книги'); }
   } catch { toast('Не удалось сохранить, попробуй ещё раз'); }
 }
 function toggleMark(st) {
@@ -5761,12 +5789,24 @@ if (window.ResizeObserver) {
   }).observe(sheetEl);
 }
 Coll.subs.add(() => { if (S && sheetOpen()) paint(); if (!views.coll.hidden) renderColl(); });
-Notes.subs.add(() => { if (S && sheetOpen()) paint(); if (!views.notes.hidden) renderNotes(); if (!views.coll.hidden) renderColl(); });
+Notes.subs.add(() => { if (S && sheetOpen()) paint(); if (!views.coll.hidden) { renderColl(); renderNotes(); } });
 
 /* ---------- collection view and Anki export ---------- */
 function fmtDate(ts) { try { return new Date(ts).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', year: 'numeric' }); } catch { return ''; } }
 /* every book has its own collection and its own notes: the chips above the list pick a book */
-const CF = { book: '', nbook: '' };
+const CF = { book: '', nbook: '', sub: 'words' };      /* sub: which half of the collection screen is open, words or notes */
+/* the two tabs on top of the collection screen: counts, the open half, and the number beside the title */
+function syncSub() {
+  const n = CF.sub === 'notes';
+  $('#c-pane-w').hidden = n; $('#c-pane-n').hidden = !n;
+  for (const b of $$('#c-tabs [data-sub]')) b.setAttribute('aria-selected', String(b.dataset.sub === CF.sub));
+  const nw = Coll.all().length, nn = Notes.all().length;
+  $('#c-nw').textContent = nw || ''; $('#c-nn').textContent = nn || '';
+  const inBk = (list, k) => k ? list.filter(e => grpKey(e) === k).length : list.length;
+  const all = n ? Notes.all() : Coll.all();
+  $('#c-count').textContent = all.length ? '· ' + inBk(all, n ? CF.nbook : CF.book) : '';
+}
+function setSub(k) { CF.sub = k === 'notes' ? 'notes' : 'words'; syncSub(); const s = $('#v-coll'); if (s) s.scrollTop = 0; scrollTo(0, 0); }
 const slugOf = t => String(t || '').replace(/[^\p{L}\p{N}]+/gu, '_').replace(/^_+|_+$/g, '').slice(0, 40);
 const grpKey = e => bookKeyOf(e) || '-';
 function groupsOf(list) {
@@ -5786,13 +5826,12 @@ function renderColl() {
   const all = Coll.all(), groups = groupsOf(all);
   if (CF.book && !groups.some(g => g.key === CF.book)) CF.book = '';
   const inBk = CF.book ? all.filter(e => grpKey(e) === CF.book) : all;
-  $('#c-count').textContent = all.length ? '· ' + inBk.length : '';
   const bk = $('#c-books'); bk.innerHTML = chipsHtml(groups, CF.book, all.length); bk.hidden = groups.length < 2;
-  const nn = Notes.all().length; $('#c-notes-n').textContent = nn ? nn + ' ' + stPl(nn, ['закладка', 'закладки', 'закладок']) : '';
   const q = normKey($('#c-q').value);
   const list = q ? inBk.filter(e => normKey([e.surface, e.lemma, e.bookPhrase, e.sentence, e.sentenceTr, (e.translations || []).join(' '), e.book].join(' ')).includes(q)) : inBk;
   $('#c-list').innerHTML = list.length ? list.map(cardHtml).join('')
     : `<div class="empty">${all.length ? 'Ничего не найдено.' : 'Пока пусто. Нажми ★ у слова в книге.'}</div>`;
+  syncSub();
 }
 function cardHtml(e) {
   const isW = e.kind !== 'sentence';
@@ -5801,7 +5840,7 @@ function cardHtml(e) {
   const tr = isW ? trs.join(' · ') : e.sentenceTr;
   const headAr = detectLang(head) === 'ar', trAr = detectLang(tr) === 'ar';
   const meta = isW ? metaParts(e, e.surface) : [];
-  const ctx = isW && e.sentence ? `<div class="card-s"${dirAttr(e.sentence)}>${boldIn(e.sentence, e.surface, -1)}</div>${e.sentenceTr ? `<div class="card-s"${dirAttr(e.sentenceTr)}>${e.sentenceSrc === 'book' ? boldAny(e.sentenceTr, e.bookPhrase) : esc(e.sentenceTr)}</div>` : ''}` : '';
+  const ctx = isW && e.sentence ? `<div class="card-s"${dirAttr(e.sentence)}>${boldIn(e.sentence, e.surface, -1)}</div>${e.sentenceTr ? `<div class="card-s"${dirAttr(e.sentenceTr)}>${hiTr(e.sentenceTr, e.sentenceSrc === 'book' ? e.bookPhrase : '', e.translations, relIn(e.sentence, e.sentence.indexOf(e.surface)))}</div>` : ''}` : '';
   return `<div class="card" data-id="${esc(e.id)}"><div class="card-top"><span class="card-w${headAr ? ' ar' : ''}"${dirAttr(head)}>${esc(isW ? head : head.slice(0, 160) + (head.length > 160 ? '…' : ''))}</span><span class="card-t${trAr ? ' ar' : ''}" dir="${trAr ? 'rtl' : 'auto'}">${esc(isW ? tr : (tr.length > 160 ? tr.slice(0, 160) + '…' : tr))}</span></div>${meta.length ? `<div class="card-s">${meta.join(' · ')}</div>` : ''}${ctx}<div class="card-m"><span>${esc([e.book, fmtDate(e.createdAt)].filter(Boolean).join(' · '))}${e.pending ? ' · ждёт синхронизации' : ''}</span><button class="del" data-cdel="${esc(e.id)}">Удалить</button></div></div>`;
 }
 const cDelTimers = new Map();
@@ -5822,7 +5861,7 @@ const qv = s => '"' + oneLine(s).replace(/"/g, '""') + '"';
 const dv = t => (detectLang(t) === 'ar' ? ' dir="rtl" style="text-align:right"' : '');
 function ankiRow(e) {
   let front, back;
-  const sentBack = e.sentenceTr ? `<hr><div${dv(e.sentenceTr)}>${e.sentenceSrc === 'book' && e.bookPhrase ? boldAny(e.sentenceTr, e.bookPhrase) : esc(e.sentenceTr)}</div>${e.sentenceSrc === 'book' ? '<div style="color:#888;font-size:.8em">из второй книги</div>' : ''}` : '';
+  const sentBack = e.sentenceTr ? `<hr><div${dv(e.sentenceTr)}>${e.kind === 'word' ? hiTr(e.sentenceTr, e.sentenceSrc === 'book' ? e.bookPhrase : '', e.translations, relIn(e.sentence, (e.sentence || '').indexOf(e.surface))) : esc(e.sentenceTr)}</div>${e.sentenceSrc === 'book' ? '<div style="color:#888;font-size:.8em">из второй книги</div>' : ''}` : '';
   if (e.kind === 'sentence') {
     front = `<div${dv(e.sentence)}>${esc(e.sentence)}</div>`;
     back = `<div${dv(e.sentenceTr)}>${esc(e.sentenceTr)}</div>${e.sentenceSrc === 'book' ? '<div style="color:#888;font-size:.8em">из второй книги</div>' : ''}`;
@@ -5885,6 +5924,7 @@ $('#c-copy').addEventListener('click', async () => {
 
 /* ---------- notes: the bookmarks, on a page of their own inside the collection ---------- */
 function noteCardHtml(n) {
+  if (n.text == null) n = Object.assign({}, n, { text: '' });          /* a half-written record must not break the whole screen */
   const isW = n.kind === 'word', ar = detectLang(n.text) === 'ar', trAr = detectLang(n.tr || '') === 'ar';
   const body = isW
     ? `<div class="card-top"><span class="card-w${ar ? ' ar' : ''}"${dirAttr(n.text)}>${esc(n.text)}</span>${n.tr ? `<span class="card-t${trAr ? ' ar' : ''}" dir="${trAr ? 'rtl' : 'auto'}">${esc(n.tr)}</span>` : ''}</div>${n.sentence ? `<div class="card-s"${dirAttr(n.sentence)}>${boldIn(n.sentence, n.text, -1)}</div>` : ''}`
@@ -5901,10 +5941,10 @@ function notesShown() {
 }
 function renderNotes() {
   const { all, groups, inBk, list } = notesShown();
-  $('#n-count').textContent = all.length ? '· ' + inBk.length : '';
   const bk = $('#n-books'); bk.innerHTML = chipsHtml(groups, CF.nbook, all.length); bk.hidden = groups.length < 2;
   $('#n-list').innerHTML = list.length ? list.map(noteCardHtml).join('')
     : `<div class="empty">${all.length ? 'Ничего не найдено.' : 'Пока пусто. Нажми закладку у слова или удержи слово в тексте.'}</div>`;
+  syncSub();
 }
 const nDelTimers = new Map();
 $('#n-list').addEventListener('click', async ev => {
@@ -5927,21 +5967,23 @@ $('#n-copy').addEventListener('click', async () => {
   if (!list.length) return toast('В заметках пока пусто');
   toast(await copyText(list.map(noteText).join('\n\n')) ? 'Скопировано' : 'Не удалось скопировать');
 });
-function openNotes() { renderNotes(); show('notes'); NAV.push('notes', () => show('coll')); }
+function openNotes() { CF.sub = 'notes'; openColl(); }
 
 /* ---------- start ---------- */
-function openColl() { renderColl(); show('coll'); NAV.push('coll', () => show('lib')); }
+function openColl() { renderColl(); renderNotes(); show('coll'); NAV.push('coll', () => show('lib')); }
 function init() {
   Coll.init(); Notes.init(); applyPrefs();
-  $('#b-back').innerHTML = ICON.back; $('#b-coll-back').innerHTML = ICON.back; $('#b-notes-back').innerHTML = ICON.back; $('#c-notes-i').innerHTML = ICON.mark;
-  $('#b-lang').addEventListener('click', switchLang); $('#b-toc').innerHTML = ICON.toc; $('#b-find').innerHTML = ICON.find; $('#f-list').innerHTML = ICON.toc; $('#f-prev').innerHTML = ICON.up; $('#f-next').innerHTML = ICON.down; $('#f-x').innerHTML = ICON.close; $('#b-par').innerHTML = ICON.par; $('#b-coll-lib').innerHTML = ICON.coll; $('#b-set-lib').innerHTML = ICON.gear;
-  $('#b-theme').addEventListener('click', toggleTheme); $('#b-theme2').addEventListener('click', toggleTheme); $('#b-theme4').addEventListener('click', toggleTheme);
+  $('#b-back').innerHTML = ICON.back; $('#b-coll-back').innerHTML = ICON.back; $('#c-ti-w').innerHTML = ICON.coll; $('#c-ti-n').innerHTML = ICON.mark;
+  $('#b-lang').addEventListener('click', switchLang); $('#b-toc').innerHTML = ICON.toc; $('#b-find').innerHTML = ICON.find; $('#f-list').innerHTML = ICON.toc; $('#f-prev').innerHTML = ICON.up; $('#f-next').innerHTML = ICON.down; $('#f-x').innerHTML = ICON.close; $('#b-par').innerHTML = ICON.par; $('#b-set-lib').innerHTML = ICON.gear;
+  $('#b-theme').addEventListener('click', toggleTheme); $('#b-theme2').addEventListener('click', toggleTheme);
   $('#b-set-lib').addEventListener('click', () => openSettings('app'));
   if (darkMQ.addEventListener) darkMQ.addEventListener('change', applyPrefs);
-  $('#b-coll-lib').addEventListener('click', openColl);
   $('#b-coll-back').addEventListener('click', () => { if (!NAV.pop('coll')) show('lib'); });
-  $('#b-notes-back').addEventListener('click', () => { if (!NAV.pop('notes')) show('coll'); });
-  $('#c-notes').addEventListener('click', openNotes);
+  $('#c-tabs').addEventListener('click', e => { const b = e.target.closest('[data-sub]'); if (b) setSub(b.dataset.sub); });
+  $('#c-tabs').addEventListener('keydown', e => {
+    if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+    e.preventDefault(); setSub(e.key === 'ArrowRight' ? 'notes' : 'words'); const t = $('#c-tabs [aria-selected=true]'); if (t) t.focus();
+  });
   renderLibrary(); stInit(); bindTour(); maybeTour();
   if (IN_CLAUDE) {
     const c = window.claude;
@@ -5951,7 +5993,7 @@ function init() {
   }
 }
 init();
-if (window.__RD_TEST) window.__rd = { wrapRows, unwrapRows, Coll, Notes, CF, collKeys, savedEntry, collExportList, openNotes, idb, gotoPageNo, pairSwitch, coverFor, thumbOf, backfillCovers, anchorKnots, chapterGroups, learnLexicon, alignGlobal, alignSeq, chapterPlan, buildAnchors, alignBooks, mmWord, mmSentence, mmChunks, ggWord, ggSentence, ggCall, mtWord, mtSentence, dictWord, dictForms, dictParse, dictImport, dictClear, dictLoad, dictSenses, parseTable, parseStarDict, errCopy, eng, findInBook, jumpToHit, openFind, findStep, fbarHide, tocCurrent, wakeState: () => !!wakeLock, wakeSync, FIND, R, BI, setParallel, exportAligned, anchorNow, restoreAnchor, goSpread, turn, relayoutKeep, pageState, setChrome, gotoChapter, pairLocate, sentencesOf, buildIndex, pxFrom, alignBooks, ensurePair, windowAt, extractFlat, alignSeq, bookLang, parseBook, importFile, P, API, Keys, eng, S: () => S };
+if (window.__RD_TEST) window.__rd = { hiTr, wrapRows, unwrapRows, Coll, Notes, CF, collKeys, savedEntry, collExportList, openNotes, idb, gotoPageNo, pairSwitch, coverFor, thumbOf, backfillCovers, anchorKnots, chapterGroups, learnLexicon, alignGlobal, alignSeq, chapterPlan, buildAnchors, alignBooks, mmWord, mmSentence, mmChunks, ggWord, ggSentence, ggCall, mtWord, mtSentence, dictWord, dictForms, dictParse, dictImport, dictClear, dictLoad, dictSenses, parseTable, parseStarDict, errCopy, eng, findInBook, jumpToHit, openFind, findStep, fbarHide, tocCurrent, wakeState: () => !!wakeLock, wakeSync, FIND, R, BI, setParallel, exportAligned, anchorNow, restoreAnchor, goSpread, turn, relayoutKeep, pageState, setChrome, gotoChapter, pairLocate, sentencesOf, buildIndex, pxFrom, alignBooks, ensurePair, windowAt, extractFlat, alignSeq, bookLang, parseBook, importFile, P, API, Keys, eng, S: () => S };
 })();
 </script>
 

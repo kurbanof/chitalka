@@ -13,8 +13,8 @@
     "minimal-ui"
   ],
   "orientation": "any",
-  "background_color": "#F0DDC5",
-  "theme_color": "#F0DDC5",
+  "background_color": "#282828",
+  "theme_color": "#282828",
   "categories": [
     "books",
     "education"
